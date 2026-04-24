@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Portfolio de desarrollador — experiencias web modernas" />
+    <title>Tu Nombre — Developer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <!-- Canvas Three.js (fijo en el fondo) -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+      <a href="#hero" class="nav-logo">TN<span class="dot">.</span></a>
+      <ul class="nav-links">
+        <li><a href="#about">Sobre mí</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="projects.html">Proyectos</a></li>
+        <li><a href="#contact">Contacto</a></li>
+      </ul>
+    </nav>
+
+    <!-- ═══════════════════ HERO ═══════════════════ -->
+    <section id="hero" class="section hero-section">
+      <div class="hero-content">
+        <p class="hero-eyebrow">Hola, soy</p>
+        <h1 class="hero-title">Luis Mata</h1>
+        <p class="hero-subtitle">
+          Full Stack Developer<br />
+          <span class="hero-subtitle-accent">Building digital experiences from scratch</span>
+        </p>
+        <div class="hero-cta">
+          <a href="projects.html" class="btn btn-primary">Ver proyectos</a>
+          <a href="#contact" class="btn btn-ghost">Contactar</a>
+        </div>
+        <div class="scroll-indicator">
+          <span>Scroll</span>
+          <div class="scroll-line"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ ABOUT ═══════════════════ -->
+    <section id="about" class="section about-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">01 / about</span>
+          <h2 class="section-title">Sobre mí</h2>
+        </div>
+        <div class="about-grid">
+          <div class="about-text">
+            <p class="about-lead">
+              Desarrollador apasionado por crear experiencias web que mezclan
+              funcionalidad con estética. Me especializo en el ecosistema
+              JavaScript moderno y disfruto convertir ideas complejas en
+              productos simples y elegantes.
+            </p>
+            <p>
+              Cuando no estoy programando, exploro nuevas tecnologías, contribuyo
+              a proyectos open source o aprendo sobre diseño 3D y gráficos en
+              tiempo real.
+            </p>
+            <div class="about-stats">
+              <div class="stat">
+                <span class="stat-number">3+</span>
+                <span class="stat-label">Años de experiencia</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">20+</span>
+                <span class="stat-label">Proyectos completados</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">10+</span>
+                <span class="stat-label">Clientes satisfechos</span>
+              </div>
+            </div>
+          </div>
+          <div class="about-visual">
+            <div class="about-sphere" id="about-sphere"></div>
+            <div class="about-badge">
+              <span class="badge-dot"></span>
+              Disponible para proyectos
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ SKILLS ═══════════════════ -->
+    <section id="skills" class="section skills-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">02 / skills</span>
+          <h2 class="section-title">Tecnologías</h2>
+        </div>
+
+        <div class="skills-category">
+          <span class="skills-category-label">Frontend</span>
+          <div class="skills-grid">
+            <div class="skill-card" data-color="yellow">
+              <div class="skill-icon"><img src="./public/js.png" alt="JavaScript"></div>
+              <span class="skill-name">JavaScript</span>
+            </div>
+            <div class="skill-card" data-color="blue">
+              <div class="skill-icon"><img src="./public/typescript.png" alt="TypeScript"></div>
+              <span class="skill-name">TypeScript</span>
+            </div>
+
+            <div class="skill-card" data-color="cyan">
+              <div class="skill-icon"><img src="./public/react.png" alt="React"></div>
+              <span class="skill-name">React</span>
+            </div>
+            <div class="skill-card" data-color="white">
+              <div class="skill-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="38"><mask height="180" id=":r8:mask0_408_134" maskUnits="userSpaceOnUse" width="180" x="0" y="0" style="mask-type: alpha;"><circle cx="90" cy="90" fill="black" r="90"></circle></mask><g mask="url(#:r8:mask0_408_134)"><circle cx="90" cy="90" data-circle="true" fill="black" r="90"></circle><path d="M149.508 157.52L69.142 54H54V125.97H66.1136V69.3836L139.999 164.845C143.333 162.614 146.509 160.165 149.508 157.52Z" fill="url(#:r8:paint0_linear_408_134)"></path><rect fill="url(#:r8:paint1_linear_408_134)" height="72" width="12" x="115" y="54"></rect></g><defs><linearGradient gradientUnits="userSpaceOnUse" id=":r8:paint0_linear_408_134" x1="109" x2="144.5" y1="116.5" y2="160.5"><stop stop-color="white"></stop><stop offset="1" stop-color="white" stop-opacity="0"></stop></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id=":r8:paint1_linear_408_134" x1="121" x2="120.799" y1="54" y2="106.875"><stop stop-color="white"></stop><stop offset="1" stop-color="white" stop-opacity="0"></stop></linearGradient></defs></svg></div>
+              <span class="skill-name">Next.js</span>
+            </div>
+            <div class="skill-card" data-color="purple">
+              <div class="skill-icon"><img src="./public/threejs.png" alt="Three.js"></div>
+              <span class="skill-name">Three.js</span>
+            </div>
+            <div class="skill-card" data-color="sky">
+              <div class="skill-icon"><img src="./public/tailwind.png" alt="Tailwind CSS"></div>
+              <span class="skill-name">Tailwind</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="skills-category">
+          <span class="skills-category-label">Backend &amp; DB</span>
+          <div class="skills-grid">
+            <div class="skill-card" data-color="green">
+              <div class="skill-icon"><img src="./public/node.png" alt="Node.js"></div>
+              <span class="skill-name">Node.js</span>
+            </div>
+            <div class="skill-card" data-color="blue">
+              <div class="skill-icon"><img src="./public/java.png" alt="Java"></div>
+              <span class="skill-name">Java</span>
+            </div>
+            <div class="skill-card" data-color="purple">
+              <div class="skill-icon">Ex</div>
+              <span class="skill-name">Express</span>
+            </div>
+            <div class="skill-card" data-color="red">
+              <div class="skill-icon"><img src="./public/nestjs.svg" alt="NestJS"></div>
+              <span class="skill-name">NestJS</span>
+            </div>
+            <div class="skill-card" data-color="blue">
+              <div class="skill-icon"><img src="./public/python.png" alt="Python"></div>
+              <span class="skill-name">Python</span>
+            </div>
+            <div class="skill-card" data-color="blue">
+              <div class="skill-icon"><img src="./public/postgre.png" alt="PostgreSQL"></div>
+              <span class="skill-name">PostgreSQL</span>
+            </div>
+            <div class="skill-card" data-color="green">
+              <div class="skill-icon"><img src="./public/mongodb.png" alt="MongoDB"></div>
+              <span class="skill-name">MongoDB</span>
+            </div>
+            <div class="skill-card" data-color="red">
+              <div class="skill-icon"><img src="./public/redis.png" alt="Redis"></div>
+              <span class="skill-name">Redis</span>
+            </div>
+            <div class="skill-card" data-color="orange">
+              <div class="skill-icon">SB</div>
+              <span class="skill-name">Supabase</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="skills-category">
+          <span class="skills-category-label">DevOps &amp; Herramientas</span>
+          <div class="skills-grid">
+            <div class="skill-card" data-color="white">
+              <div class="skill-icon"><img src="./public/git.png" alt="Git"></div>
+              <span class="skill-name">Git</span>
+            </div>
+            <div class="skill-card" data-color="blue">
+              <div class="skill-icon"><img src="./public/docker.png" alt="Docker"></div>
+              <span class="skill-name">Docker</span>
+            </div>
+            <div class="skill-card" data-color="orange">
+              <div class="skill-icon"><img src="./public/github.png" alt="GitHub CI"></div>
+              <span class="skill-name">GitHub CI</span>
+            </div>
+            <div class="skill-card" data-color="yellow">
+              <div class="skill-icon">⚡</div>
+              <span class="skill-name">Vite</span>
+            </div>
+            <div class="skill-card" data-color="purple">
+              <div class="skill-icon"><img src="./public/figma.png" alt="Figma"></div>
+              <span class="skill-name">Figma</span>
+            </div>
+            <div class="skill-card" data-color="green">
+              <div class="skill-icon">Vx</div>
+              <span class="skill-name">Vitest</span>
+            </div>
+            <div class="skill-card" data-color="green">
+              <div class="skill-icon"><img src="./public/aws.png" alt="AWS"></div>
+              <span class="skill-name">AWS</span>
+            </div>
+            <div class="skill-card" data-color="red">
+              <div class="skill-icon"><img src="./public/oracle.png" alt="AWS"></div>
+              <span class="skill-name">Oracle</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════ PROJECTS ═══════════════════ -->
+    <section id="projects" class="section projects-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">03 / projects</span>
+          <h2 class="section-title">Proyectos</h2>
+        </div>
+        <div class="projects-grid">
+
+          <article class="project-card">
+            <div class="project-image">
+              <div class="project-placeholder" style="--hue: 240"></div>
+            </div>
+            <div class="project-content">
+              <div class="project-tags">
+                <span class="tag">React</span>
+                <span class="tag">Node.js</span>
+                <span class="tag">PostgreSQL</span>
+              </div>
+              <h3 class="project-title">Project Alpha</h3>
+              <p class="project-description">
+                Descripción de tu proyecto. Explica qué hace, qué problema resuelve
+                y cuál fue tu rol en el desarrollo.
+              </p>
+              <div class="project-links">
+                <a href="#" class="project-link" target="_blank" rel="noopener">GitHub</a>
+                <a href="#" class="project-link project-link--primary" target="_blank" rel="noopener">Live Demo →</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-image">
+              <div class="project-placeholder" style="--hue: 280"></div>
+            </div>
+            <div class="project-content">
+              <div class="project-tags">
+                <span class="tag">TypeScript</span>
+                <span class="tag">Three.js</span>
+                <span class="tag">WebGL</span>
+              </div>
+              <h3 class="project-title">Project Beta</h3>
+              <p class="project-description">
+                Descripción del segundo proyecto. ¿Qué tecnologías usaste?
+                ¿Qué aprendiste? ¿Cuál fue el desafío principal?
+              </p>
+              <div class="project-links">
+                <a href="#" class="project-link" target="_blank" rel="noopener">GitHub</a>
+                <a href="#" class="project-link project-link--primary" target="_blank" rel="noopener">Live Demo →</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-image">
+              <div class="project-placeholder" style="--hue: 180"></div>
+            </div>
+            <div class="project-content">
+              <div class="project-tags">
+                <span class="tag">Next.js</span>
+                <span class="tag">Tailwind</span>
+                <span class="tag">Supabase</span>
+              </div>
+              <h3 class="project-title">Project Gamma</h3>
+              <p class="project-description">
+                Tercer proyecto destacado. Habla del impacto o los resultados
+                concretos que logró este trabajo.
+              </p>
+              <div class="project-links">
+                <a href="#" class="project-link" target="_blank" rel="noopener">GitHub</a>
+                <a href="#" class="project-link project-link--primary" target="_blank" rel="noopener">Live Demo →</a>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ CONTACT ═══════════════════ -->
+    <section id="contact" class="section contact-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">04 / contact</span>
+          <h2 class="section-title">¿Hablamos?</h2>
+        </div>
+        <div class="contact-grid">
+          <div class="contact-text">
+            <p class="contact-lead">
+              Estoy abierto a nuevas oportunidades, colaboraciones y proyectos
+              freelance. Si tienes una idea o quieres simplemente saludar,
+              ¡escríbeme!
+            </p>
+            <a href="mailto:tu@email.com" class="btn btn-primary contact-cta">
+              Enviar email
+            </a>
+          </div>
+          <div class="contact-socials">
+            <a href="https://github.com/tuusuario" class="social-link" target="_blank" rel="noopener">
+              <span class="social-icon">GH</span>
+              <span>GitHub</span>
+            </a>
+            <a href="https://linkedin.com/in/tuusuario" class="social-link" target="_blank" rel="noopener">
+              <span class="social-icon">in</span>
+              <span>LinkedIn</span>
+            </a>
+            <a href="https://twitter.com/tuusuario" class="social-link" target="_blank" rel="noopener">
+              <span class="social-icon">X</span>
+              <span>Twitter / X</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <footer class="footer">
+        <p>Diseñado y construido por <strong>Tu Nombre</strong> · 2025</p>
+        <p class="footer-sub">Hecho con Three.js + Vite</p>
+      </footer>
+    </section>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
