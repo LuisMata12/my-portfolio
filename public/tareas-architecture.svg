@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 432" role="img" aria-labelledby="t d">
+  <title id="t">Arquitectura del gestor de tareas en AWS</title>
+  <desc id="d">GitHub Actions compila la app React y la sube a S3, servida por CloudFront. El navegador llama a una API REST en API Gateway con Lambda, que guarda las tareas en DynamoDB.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0025"/>
+      <stop offset="1" stop-color="#030014"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.35" r="0.6">
+      <stop offset="0" stop-color="#7c3aed" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#a855f7"/>
+    </marker>
+    <marker id="arrc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#06b6d4"/>
+    </marker>
+    <style>
+      .box{fill:rgba(255,255,255,0.05);stroke:rgba(255,255,255,0.18);stroke-width:1.5}
+      .core{fill:rgba(124,58,237,0.22);stroke:#a855f7;stroke-width:2}
+      .ai{fill:rgba(6,182,212,0.12);stroke:#06b6d4;stroke-width:1.5;stroke-dasharray:6 4}
+      .name{font:700 22px system-ui,-apple-system,'Segoe UI',sans-serif;fill:#ffffff}
+      .sub{font:500 15px ui-monospace,'SFMono-Regular',Menlo,monospace;fill:#94a3b8}
+      .lbl{font:600 14px ui-monospace,'SFMono-Regular',Menlo,monospace;fill:#c4b5fd}
+      .lblc{font:600 14px ui-monospace,'SFMono-Regular',Menlo,monospace;fill:#67e8f9}
+      .ln{stroke:#a855f7;stroke-width:2;fill:none}
+      .lnc{stroke:#06b6d4;stroke-width:2;fill:none;stroke-dasharray:6 4}
+      .hdr{font:600 15px ui-monospace,'SFMono-Regular',Menlo,monospace;fill:#a855f7;letter-spacing:2px}
+      .chip{fill:rgba(255,255,255,0.06);stroke:rgba(255,255,255,0.12)}
+      .chipt{font:500 13px ui-monospace,'SFMono-Regular',Menlo,monospace;fill:#cbd5e1}
+    </style>
+  </defs>
+
+    <rect width="800" height="432" fill="url(#bg)"/>
+  <rect width="800" height="432" fill="url(#glow)"/>
+  <text x="40" y="58" class="hdr">GESTOR DE TAREAS · AWS</text>
+  <rect x="40" y="96" width="200" height="76" rx="12" class="box"/>
+  <text x="140" y="130" text-anchor="middle" class="name">GitHub Actions</text>
+  <text x="140" y="155" text-anchor="middle" class="sub">build + deploy</text>
+  <rect x="300" y="96" width="200" height="76" rx="12" class="core"/>
+  <text x="400" y="130" text-anchor="middle" class="name">S3</text>
+  <text x="400" y="155" text-anchor="middle" class="sub">React · Vite</text>
+  <rect x="560" y="96" width="200" height="76" rx="12" class="box"/>
+  <text x="660" y="130" text-anchor="middle" class="name">CloudFront</text>
+  <text x="660" y="155" text-anchor="middle" class="sub">CDN · HTTPS</text>
+  <rect x="40" y="276" width="200" height="76" rx="12" class="box"/>
+  <text x="140" y="310" text-anchor="middle" class="name">DynamoDB</text>
+  <text x="140" y="335" text-anchor="middle" class="sub">tabla de tareas</text>
+  <rect x="300" y="276" width="200" height="76" rx="12" class="box"/>
+  <text x="400" y="310" text-anchor="middle" class="name">Lambda</text>
+  <text x="400" y="335" text-anchor="middle" class="sub">CRUD de tareas</text>
+  <rect x="560" y="276" width="200" height="76" rx="12" class="core"/>
+  <text x="660" y="310" text-anchor="middle" class="name">API Gateway</text>
+  <text x="660" y="335" text-anchor="middle" class="sub">REST API</text>
+
+  <line x1="240" y1="134" x2="296" y2="134" class="ln" marker-end="url(#arr)"/>
+  <text x="268" y="88" text-anchor="middle" class="lbl">sync</text>
+  <line x1="500" y1="134" x2="556" y2="134" class="ln" marker-end="url(#arr)"/>
+  <text x="528" y="88" text-anchor="middle" class="lbl">origen</text>
+  <line x1="660" y1="172" x2="660" y2="272" class="lnc" marker-end="url(#arrc)"/>
+  <text x="550" y="216" text-anchor="end" class="lblc">navegador →</text>
+  <text x="550" y="236" text-anchor="end" class="lblc">GET POST PUT DELETE</text>
+  <line x1="560" y1="314" x2="504" y2="314" class="ln" marker-end="url(#arr)"/>
+  <line x1="300" y1="314" x2="244" y2="314" class="ln" marker-end="url(#arr)"/>
+
+  <rect x="40" y="380" width="164" height="30" rx="15" class="chip"/>
+  <text x="122" y="400" text-anchor="middle" class="chipt">push a main</text>
+  <rect x="216" y="380" width="200" height="30" rx="15" class="chip"/>
+  <text x="316" y="400" text-anchor="middle" class="chipt">invalidación de caché</text>
+  <rect x="428" y="380" width="120" height="30" rx="15" class="chip"/>
+  <text x="488" y="400" text-anchor="middle" class="chipt">serverless</text>
+</svg>

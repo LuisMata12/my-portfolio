@@ -63,20 +63,21 @@
 
           <article class="project-card">
             <div class="project-image">
-              <img src="./public/project-tareas.png" alt="Gestor de tareas en AWS" />
+              <img src="./public/tareas-architecture.svg" alt="Arquitectura del gestor de tareas: GitHub Actions, S3, CloudFront, API Gateway, Lambda y DynamoDB" style="width:100%;height:100%;object-fit:contain;background:#05001c;" />
             </div>
             <div class="project-content">
               <div class="project-tags">
                 <span class="tag">React</span>
-                <span class="tag">Vite</span>
                 <span class="tag">AWS S3</span>
                 <span class="tag">CloudFront</span>
                 <span class="tag">API Gateway</span>
+                <span class="tag">Lambda</span>
+                <span class="tag">DynamoDB</span>
                 <span class="tag">GitHub Actions</span>
               </div>
               <h3 class="project-title">Gestor de tareas en AWS</h3>
               <p class="project-description">
-                Aplicación de tareas en React servida desde S3 con CloudFront como CDN y un backend serverless expuesto con API Gateway. Cada push a main dispara un pipeline en GitHub Actions que compila, sube el build a S3 e invalida la caché de CloudFront.
+                Aplicación de tareas en React servida desde S3 con CloudFront como CDN y un backend serverless: API Gateway y Lambda con las tareas en DynamoDB. Cada push a main dispara un pipeline en GitHub Actions que compila, sube el build a S3 e invalida la caché de CloudFront.
               </p>
               <div class="project-links">
                 <a href="https://github.com/LuisMata12/tareas-frontend" class="project-link" target="_blank" rel="noopener">GitHub</a>
