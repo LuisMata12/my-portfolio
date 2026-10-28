@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Proyectos — Portfolio de Luis Mata" />
+    <meta name="description" content="Proyectos de Luis Mata, Full Stack Developer: CausaOps, gestor de tareas en AWS, Hinnk AI y portafolio 3D." />
     <title>Proyectos — Luis Mata</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,7 +13,7 @@
   </head>
   <body>
     <nav class="navbar" id="navbar-main">
-      <a href="/index.html" class="nav-logo">TN<span class="dot">.</span></a>
+      <a href="/index.html" class="nav-logo">LM<span class="dot">.</span></a>
       <ul class="nav-links">
         <li><a href="/index.html#about">Sobre mí</a></li>
         <li><a href="/index.html#skills">Skills</a></li>
@@ -39,22 +39,68 @@
 
           <article class="project-card">
             <div class="project-image">
-              <div class="project-placeholder" style="--hue: 240"></div>
+              <div class="project-placeholder" style="--hue: 200"></div>
+            </div>
+            <div class="project-content">
+              <div class="project-tags">
+                <span class="tag">Next.js</span>
+                <span class="tag">TypeScript</span>
+                <span class="tag">FastAPI</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">SQLAlchemy</span>
+                <span class="tag">Docker</span>
+                <span class="tag">LLM</span>
+              </div>
+              <h3 class="project-title">CausaOps</h3>
+              <p class="project-description">
+                Plataforma de observabilidad y respuesta a incidentes. Un servicio de pagos de demostración envía telemetría; reglas deterministas detectan errores y latencia p95 anómalos, agrupan incidentes y los correlacionan con despliegues. Un LLM genera diagnósticos con esquema JSON estricto que el backend valida contra la evidencia, y la IA nunca ejecuta acciones por su cuenta. Monorepo con Docker Compose, migraciones con Alembic, pruebas unitarias y CI.
+              </p>
+              <div class="project-links">
+                <a href="https://github.com/LuisMata12/CausaOps" class="project-link" target="_blank" rel="noopener">GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-image">
+              <img src="./public/project-tareas.png" alt="Gestor de tareas en AWS" />
             </div>
             <div class="project-content">
               <div class="project-tags">
                 <span class="tag">React</span>
-                <span class="tag">Node.js</span>
-                <span class="tag">PostgreSQL</span>
+                <span class="tag">Vite</span>
+                <span class="tag">AWS S3</span>
+                <span class="tag">CloudFront</span>
+                <span class="tag">API Gateway</span>
+                <span class="tag">GitHub Actions</span>
               </div>
-              <h3 class="project-title">Project Alpha</h3>
+              <h3 class="project-title">Gestor de tareas en AWS</h3>
               <p class="project-description">
-                Descripción de tu proyecto. Explica qué hace, qué problema resuelve
-                y cuál fue tu rol en el desarrollo.
+                Aplicación de tareas en React servida desde S3 con CloudFront como CDN y un backend serverless expuesto con API Gateway. Cada push a main dispara un pipeline en GitHub Actions que compila, sube el build a S3 e invalida la caché de CloudFront.
               </p>
               <div class="project-links">
-                <a href="#" class="project-link" target="_blank" rel="noopener">GitHub</a>
-                <a href="#" class="project-link project-link--primary" target="_blank" rel="noopener">Live Demo →</a>
+                <a href="https://github.com/LuisMata12/tareas-frontend" class="project-link" target="_blank" rel="noopener">GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-image">
+              <img src="./public/hinnk.png" alt="Hinnk AI" />
+            </div>
+            <div class="project-content">
+              <div class="project-tags">
+                <span class="tag">Next.js</span>
+                <span class="tag">React</span>
+                <span class="tag">WebGL</span>
+                <span class="tag">Vercel</span>
+              </div>
+              <h3 class="project-title">Hinnk AI</h3>
+              <p class="project-description">
+                Landing page responsive para Hinnk, plataforma de automatización con agentes de IA. Construida en Next.js con una escena WebGL, componentes modulares y despliegue continuo en Vercel.
+              </p>
+              <div class="project-links">
+                <a href="https://hinnk-page.vercel.app/" class="project-link project-link--primary" target="_blank" rel="noopener">Live Demo →</a>
               </div>
             </div>
           </article>
@@ -65,40 +111,17 @@
             </div>
             <div class="project-content">
               <div class="project-tags">
-                <span class="tag">TypeScript</span>
                 <span class="tag">Three.js</span>
+                <span class="tag">GSAP</span>
+                <span class="tag">Vite</span>
                 <span class="tag">WebGL</span>
               </div>
-              <h3 class="project-title">Project Beta</h3>
+              <h3 class="project-title">Portafolio 3D</h3>
               <p class="project-description">
-                Descripción del segundo proyecto. ¿Qué tecnologías usaste?
-                ¿Qué aprendiste? ¿Cuál fue el desafío principal?
+                Este sitio: una escena 3D con galaxia y campo de estrellas en Three.js que reacciona al scroll, con animaciones en GSAP y JavaScript sin framework.
               </p>
               <div class="project-links">
-                <a href="#" class="project-link" target="_blank" rel="noopener">GitHub</a>
-                <a href="#" class="project-link project-link--primary" target="_blank" rel="noopener">Live Demo →</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-image">
-              <div class="project-placeholder" style="--hue: 180"></div>
-            </div>
-            <div class="project-content">
-              <div class="project-tags">
-                <span class="tag">Next.js</span>
-                <span class="tag">Tailwind</span>
-                <span class="tag">Supabase</span>
-              </div>
-              <h3 class="project-title">Project Gamma</h3>
-              <p class="project-description">
-                Tercer proyecto destacado. Habla del impacto o los resultados
-                concretos que logró este trabajo.
-              </p>
-              <div class="project-links">
-                <a href="#" class="project-link" target="_blank" rel="noopener">GitHub</a>
-                <a href="#" class="project-link project-link--primary" target="_blank" rel="noopener">Live Demo →</a>
+                <a href="https://github.com/LuisMata12/my-portfolio" class="project-link" target="_blank" rel="noopener">GitHub</a>
               </div>
             </div>
           </article>
@@ -106,14 +129,14 @@
         </div>
 
         <div style="margin-top: 40px; color: var(--text-muted);">
-          <p>¿Quieres ver más? Puedes visitar mi <a href="https://github.com/tuusuario" target="_blank" rel="noopener">GitHub</a> o contactarme directamente.</p>
+          <p>¿Quieres ver más? Puedes visitar mi <a href="https://github.com/LuisMata12" target="_blank" rel="noopener">GitHub</a> o contactarme directamente.</p>
         </div>
 
       </div>
     </main>
 
     <footer class="footer" style="margin-top: 80px;">
-      <p>Diseñado y construido por <strong>Tu Nombre</strong> · 2025</p>
+      <p>Diseñado y construido por <strong>Luis Mata</strong> · 2026</p>
     </footer>
 
   </body>

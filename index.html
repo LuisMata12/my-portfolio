@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Portfolio de desarrollador — experiencias web modernas" />
-    <title> — Developer</title>
+    <meta name="description" content="Luis Mata — Full Stack Developer en Ciudad de México. React, Next.js, Node.js, Python y AWS." />
+    <title>Luis Mata — Full Stack Developer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -62,8 +62,10 @@
               productos simples y elegantes.
             </p>
             <p>
-              Cuando no estoy programando, exploro nuevas tecnologías, contribuyo
-              a proyectos open source o aprendo sobre diseño 3D y nuevas tecnologias de AI.
+              Trabajé como desarrollador de aplicaciones en Accenture México. Hoy
+              construyo productos de punta a punta: desde la interfaz hasta el
+              despliegue en la nube, y me interesa especialmente el diseño 3D y
+              las aplicaciones de IA.
             </p>
             <div class="about-stats">
               <div class="stat">
@@ -71,12 +73,12 @@
                 <span class="stat-label">Años de experiencia</span>
               </div>
               <div class="stat">
-                <span class="stat-number">20+</span>
-                <span class="stat-label">Proyectos completados</span>
+                <span class="stat-number">Ex</span>
+                <span class="stat-label">Accenture México</span>
               </div>
               <div class="stat">
-                <span class="stat-number">10+</span>
-                <span class="stat-label">Clientes satisfechos</span>
+                <span class="stat-number">E2E</span>
+                <span class="stat-label">Frontend, backend y nube</span>
               </div>
             </div>
           </div>
@@ -204,7 +206,7 @@
               <span class="skill-name">AWS</span>
             </div>
             <div class="skill-card" data-color="red">
-              <div class="skill-icon"><img src="./public/oracle.png" alt="AWS"></div>
+              <div class="skill-icon"><img src="./public/oracle.png" alt="Oracle"></div>
               <span class="skill-name">Oracle</span>
             </div>
           </div>
@@ -218,89 +220,88 @@
       <div class="container">
         <div class="section-header">
           <span class="section-tag">03 / projects</span>
-          <h2 class="section-title">Ultimo proyecto</h2>
+          <h2 class="section-title">Proyectos destacados</h2>
         </div>
         <div class="projects-grid">
 
           <article class="project-card">
             <div class="project-image">
-              <img src="./public/project-tareas.png" alt="aws-project-tareas" />
+              <div class="project-placeholder" style="--hue: 200"></div>
             </div>
             <div class="project-content">
               <div class="project-tags">
-                <span class="tag">AWS</span>
-                <span class="tag">Node.js</span>
-                <span class="tag">Lambda</span>
-                <span class="tag">S3</span>
-                <span class="tag">DynamoDB</span>
-                <span class="tag">CI/CD</span>
+                <span class="tag">Next.js</span>
+                <span class="tag">TypeScript</span>
+                <span class="tag">FastAPI</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">Docker</span>
+                <span class="tag">LLM</span>
               </div>
-              <h3 class="project-title">Arquitectura AWS</h3>
+              <h3 class="project-title">CausaOps</h3>
               <p class="project-description">
-                Arquitectura AWS de nivel de producción que demuestra patrones de diseño nativos de la nube, 
-                abarcando la entrega de CDN para el frontend, computación sin servidor, bases de datos relacionales y NoSQL, y gestión de API. Se implementó una canalización CI/CD integrada con pruebas y despliegue automatizados
+                Plataforma de observabilidad y respuesta a incidentes. Ingiere
+                telemetría, detecta regresiones con reglas deterministas, las
+                correlaciona con despliegues y genera diagnósticos con un LLM
+                validados contra la evidencia. La IA no ejecuta acciones: el
+                rollback requiere aprobación humana.
               </p>
               <div class="project-links">
-                <a href="https://github.com/LuisMata12/tareas-frontend" class="project-link" target="_blank" rel="noopener">GitHub</a>
-                <!-- <a href="#" class="project-link project-link--primary" target="_blank" rel="noopener">Live Demo →</a> -->
+                <a href="https://github.com/LuisMata12/CausaOps" class="project-link" target="_blank" rel="noopener">GitHub</a>
               </div>
             </div>
           </article>
 
-          <!-- Hailitar una vez que tenga los demas proyectos en github -->
-
           <article class="project-card">
             <div class="project-image">
-              <img src="./public/hinnk.png" alt="hinnk-project">
+              <img src="./public/project-tareas.png" alt="Gestor de tareas desplegado en AWS" />
             </div>
             <div class="project-content">
               <div class="project-tags">
-                <span class="tag">NextJS</span>
+                <span class="tag">React</span>
+                <span class="tag">AWS S3</span>
+                <span class="tag">CloudFront</span>
+                <span class="tag">API Gateway</span>
+                <span class="tag">GitHub Actions</span>
+              </div>
+              <h3 class="project-title">Gestor de tareas en AWS</h3>
+              <p class="project-description">
+                Aplicación de tareas en React servida desde S3 con CloudFront como
+                CDN y un backend serverless expuesto con API Gateway. Cada push a
+                main dispara un pipeline en GitHub Actions que compila, sube el
+                build a S3 e invalida la caché de CloudFront.
+              </p>
+              <div class="project-links">
+                <a href="https://github.com/LuisMata12/tareas-frontend" class="project-link" target="_blank" rel="noopener">GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-image">
+              <img src="./public/hinnk.png" alt="Landing page de Hinnk AI">
+            </div>
+            <div class="project-content">
+              <div class="project-tags">
+                <span class="tag">Next.js</span>
                 <span class="tag">React</span>
                 <span class="tag">WebGL</span>
-                <span class="tag">Three.js</span>
-                <span class="tag">Python</span>
-                <span class="tag">AI</span>
-                <span class="tag">Anthropic</span>
+                <span class="tag">Vercel</span>
               </div>
               <h3 class="project-title">Hinnk AI</h3>
               <p class="project-description">
-                Landing page responsive para HINNK, plataforma enterprise de automatización 
-                con IA que ejecuta procesos operativos de principio a fin. Desarrollada con 
-                React 18 y Tailwind CSS siguiendo mejores prácticas de componetización y 
-                arquitectura modular. Implementé pipeline completo de CI/CD con GitHub Actions 
-                incluyendo linting automático, testing, y deployment a Vercel. El proyecto 
-                incluye optimizaciones de rendimiento como code splitting, lazy loading, y 
-                análisis de bundle size para garantizar Core Web Vitals óptimos.
+                Landing page responsive para Hinnk, plataforma de automatización
+                con agentes de IA. Construida en Next.js con una escena WebGL,
+                componentes modulares y despliegue continuo en Vercel.
               </p>
               <div class="project-links">
                 <a href="https://hinnk-page.vercel.app/" class="project-link project-link--primary" target="_blank" rel="noopener">Live Demo →</a>
               </div>
             </div>
           </article>
-           <!-- Hailitar una vez que tenga los demas proyectos en github -->
-          <!-- <article class="project-card">
-            <div class="project-image">
-              <div class="project-placeholder" style="--hue: 180"></div>
-            </div>
-            <div class="project-content">
-              <div class="project-tags">
-                <span class="tag">Next.js</span>
-                <span class="tag">Tailwind</span>
-                <span class="tag">Supabase</span>
-              </div>
-              <h3 class="project-title">Project Gamma</h3>
-              <p class="project-description">
-                Tercer proyecto destacado. Habla del impacto o los resultados
-                concretos que logró este trabajo.
-              </p>
-              <div class="project-links">
-                <a href="#" class="project-link" target="_blank" rel="noopener">GitHub</a>
-                <a href="#" class="project-link project-link--primary" target="_blank" rel="noopener">Live Demo →</a>
-              </div>
-            </div>
-          </article>  -->
 
+        </div>
+        <div style="margin-top: 40px;">
+          <a href="projects.html" class="btn btn-ghost">Ver todos los proyectos</a>
         </div>
       </div>
     </section>
@@ -319,8 +320,8 @@
               freelance. Si tienes una idea o quieres simplemente saludar,
               ¡escríbeme!
             </p>
-            <a href="mailto:tu@email.com" class="btn btn-primary contact-cta">
-              Enviar email
+            <a href="https://www.linkedin.com/in/luis-mata-ram%C3%ADrez-software-engineer/" class="btn btn-primary contact-cta" target="_blank" rel="noopener">
+              Escríbeme en LinkedIn
             </a>
           </div>
           <div class="contact-socials">
@@ -336,7 +337,7 @@
         </div>
       </div>
       <footer class="footer">
-        <p>Diseñado y construido por <strong>Luis Mata</strong> · 2025</p>
+        <p>Diseñado y construido por <strong>Luis Mata</strong> · 2026</p>
         <p class="footer-sub">Hecho con Three.js + Vite</p>
       </footer>
     </section>
