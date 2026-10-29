@@ -10,6 +10,7 @@ export default defineConfig({
         main: resolve(import.meta.dirname, 'index.html'),
         projects: resolve(import.meta.dirname, 'projects.html'),
         pistu: resolve(import.meta.dirname, 'pistu.html'),
+        causaops: resolve(import.meta.dirname, 'causaops.html'),
       },
     },
   },

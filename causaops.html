@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>CausaOps — Caso de estudio · Luis Mata</title>
+    <meta name="description" content="CausaOps: plataforma de incidentes que detecta degradaciones con reglas deterministas y las diagnostica con un LLM que no puede inventar evidencia. FastAPI, PostgreSQL, Next.js y Groq." />
+    <meta property="og:title" content="CausaOps — diagnósticos de IA vinculados a evidencia" />
+    <meta property="og:description" content="Caso de estudio de Luis Mata: FastAPI, PostgreSQL, Next.js y un LLM con validación de evidencia en el backend." />
+    <meta property="og:image" content="https://my-portfolio-taupe-five-58.vercel.app/causaops/03-incident-detail.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Columna de lectura estrecha; las figuras rompen a una columna ancha. Fondo oscuro heredado del producto. */
+:root{
+  --ink:#080b0f;
+  --panel:#11161d;
+  --panel-2:#161c25;
+  --line:#242d38;
+  --fg:#f3f6f8;
+  --dim:#9aa6b2;
+  --fact:#b7f34a;
+  --ai:#75a8ff;
+  --fail:#ff7474;
+  --col:730px;
+  --wide:1140px;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+img{max-width:100%}
+.topnav{position:sticky;top:0;z-index:10;background:rgba(8,11,15,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topnav .inner{max-width:var(--wide);margin:0 auto;padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));display:flex;align-items:center;justify-content:space-between;gap:16px}
+.topnav a{color:var(--fg);text-decoration:none;font-weight:500;font-size:14.5px}
+.topnav a:hover{color:var(--fact)}
+.topnav .logo{font-family:var(--display);font-weight:800;font-size:19px}
+.topnav .logo span{color:var(--fact)}
+.topnav nav{display:flex;gap:20px}
+.links{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:28px}
+.links a.btn{display:inline-block;background:var(--fact);color:var(--ink);text-decoration:none;font-weight:600;padding:11px 18px;border-radius:10px}
+.links a.btn:hover{filter:brightness(1.08)}
+.links .note{color:var(--dim);font-size:13.5px}
+footer a{color:var(--fg)}
+.back{display:inline-block;margin-top:18px;color:var(--fact)}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--fg);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{
+  max-width:var(--wide);
+  margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.col{max-width:var(--col)}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:-.02em}
+p{margin:0}
+
+/* ---- cabecera ---- */
+.hero{padding-block:72px 56px;border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);
+}
+.hero h1{
+  font-size:clamp(52px,11vw,104px);font-weight:800;line-height:.92;
+  letter-spacing:-.045em;margin-block:20px 0;
+}
+.hero h1 em{font-style:normal;color:var(--fact)}
+.lede{font-size:clamp(18px,2.4vw,22px);line-height:1.5;color:var(--fg);margin-top:24px;max-width:30em}
+.sub{color:var(--dim);margin-top:14px;max-width:34em}
+.facts{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px;background:var(--ink);border:1px solid var(--line);border-radius:10px;
+  overflow:hidden;margin-top:40px;
+}
+.facts div{background:var(--ink);padding:14px 16px;box-shadow:0 0 0 1px var(--line)}
+.facts dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.facts dd{margin:6px 0 0;font-size:14px;font-weight:500}
+
+/* ---- secciones ---- */
+section{padding-block:64px;border-bottom:1px solid var(--line)}
+.tag{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.tag span{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.tag i{display:block;width:26px;height:2px;background:var(--fact);flex:none}
+h2{font-size:clamp(28px,4.4vw,40px);font-weight:700;line-height:1.1}
+h3{font-size:19px;font-weight:700;line-height:1.3}
+.body{display:flex;flex-direction:column;gap:18px;margin-top:22px;color:var(--dim);font-size:16.5px}
+.body strong{color:var(--fg);font-weight:600}
+code{font-family:var(--mono);font-size:.88em;color:var(--fg);background:var(--panel-2);padding:1px 5px;border-radius:4px}
+
+/* ---- tres decisiones ---- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px;margin-top:34px}
+.card{border:1px solid var(--line);border-radius:12px;padding:24px;background:var(--panel);min-width:0}
+.card .n{font-family:var(--mono);font-size:11px;color:var(--fact);letter-spacing:.1em}
+.card h3{margin-block:12px 10px}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.6}
+.card .echo{
+  margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:12px;color:var(--fg);line-height:1.5;
+}
+
+/* ---- figuras ---- */
+figure{margin:0}
+.fig{margin-top:36px}
+.scroller{
+  overflow-x:auto;border:1px solid var(--line);border-radius:12px;
+  background:var(--ink);
+}
+.scroller svg{display:block;min-width:720px;width:100%;height:auto}
+figcaption{margin-top:14px;color:var(--dim);font-size:13.5px;line-height:1.55;max-width:62em}
+
+/* ---- franja de datos reales ---- */
+.run{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;margin-top:34px;
+}
+.run div{background:var(--panel);padding:16px}
+.run dt{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--dim)}
+.run dd{
+  margin:8px 0 0;font-family:var(--display);font-size:25px;font-weight:700;
+  letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+}
+.run dd small{display:block;font-family:var(--mono);font-size:10.5px;font-weight:400;color:var(--dim);letter-spacing:0;margin-top:4px}
+.run .ok dd{color:var(--fact)}
+.run .ai dd{color:var(--ai)}
+.run .bad dd{color:var(--fail)}
+
+/* ---- capturas ---- */
+.shots{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:34px}
+.shot{
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel);
+  display:flex;flex-direction:column;min-width:0;
+}
+.shot .bar{
+  display:flex;align-items:center;gap:7px;padding:10px 13px;
+  border-bottom:1px solid var(--line);background:var(--panel-2);
+}
+.shot .bar b{width:8px;height:8px;border-radius:50%;background:var(--line);flex:none}
+.shot .bar span{
+  font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-left:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.shot button{
+  padding:0;border:0;background:none;cursor:pointer;display:block;width:100%;
+  aspect-ratio:16/11;overflow:hidden;
+}
+.shot button:focus-visible{outline:2px solid var(--fact);outline-offset:-2px}
+.shot img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.shot figcaption{margin:0;padding:14px 16px;font-size:13px;border-top:1px solid var(--line)}
+.shot figcaption b{color:var(--fg);font-weight:600;display:block;margin-bottom:3px;font-size:13.5px}
+
+/* ---- visor ---- */
+dialog#viewer{
+  border:0;padding:0;max-width:100vw;max-height:100vh;width:100%;height:100%;
+  background:rgba(4,6,9,.96);color:var(--fg);
+}
+dialog#viewer::backdrop{background:rgba(4,6,9,.9)}
+.viewer-in{height:100%;overflow:auto;padding:0 0 48px}
+.viewer-top{
+  position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;
+  gap:14px;padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));
+  background:rgba(8,11,15,.94);border-bottom:1px solid var(--line);
+}
+.viewer-top p{font-family:var(--mono);font-size:12px;color:var(--dim);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.viewer-top button{
+  font-family:var(--mono);font-size:12px;color:var(--fg);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:7px;padding:7px 13px;cursor:pointer;flex:none;
+}
+.viewer-top button:hover{border-color:var(--fact)}
+#viewer img{display:block;width:100%;max-width:1180px;margin:20px auto 0;border-radius:8px}
+
+/* ---- stack / estado ---- */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));gap:40px;margin-top:30px}
+.rows{display:flex;flex-direction:column;gap:0;margin-top:4px}
+.row{display:flex;gap:14px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line);min-width:0}
+.row dt{font-family:var(--mono);font-size:11.5px;color:var(--dim);width:104px;flex:none;letter-spacing:.04em}
+.row dd{margin:0;font-size:14.5px;min-width:0}
+.phases{display:flex;flex-direction:column;gap:0;margin-top:4px;counter-reset:ph}
+.ph{display:flex;gap:13px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.ph i{
+  font-family:var(--mono);font-size:10px;font-style:normal;letter-spacing:.06em;
+  border:1px solid var(--line);border-radius:20px;padding:2px 9px;color:var(--dim);flex:none;
+}
+.ph.done i{color:var(--fact);border-color:color-mix(in srgb,var(--fact) 42%,transparent)}
+.ph.now i{color:var(--ai);border-color:color-mix(in srgb,var(--ai) 55%,transparent)}
+.ph.done span,.ph.now span{color:var(--fg)}
+.ph span{color:var(--dim);min-width:0}
+
+footer{padding-block:44px 64px;color:var(--dim);font-family:var(--mono);font-size:12px}
+footer p+p{margin-top:8px}
+
+@media (max-width:760px){
+  .shots{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .hero{padding-block:48px 40px}
+  section{padding-block:48px}
+  .shot button{aspect-ratio:4/3}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+  </head>
+  <body>
+<header class="topnav">
+  <div class="inner">
+    <a href="/index.html" class="logo">LM<span>.</span></a>
+    <nav aria-label="Principal">
+      <a href="/projects.html">Proyectos</a>
+      <a href="/index.html#contact">Contacto</a>
+    </nav>
+  </div>
+</header>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="eyebrow">Proyecto personal &middot; Plataforma de incidentes</p>
+    <h1>Causa<em>Ops</em></h1>
+    <p class="lede">Detecta la degradaci&oacute;n de un servicio con reglas deterministas, la diagnostica con un modelo que no puede inventar evidencia, y verifica la recuperaci&oacute;n con hechos.</p>
+    <p class="sub">Un LLM leyendo logs es la parte f&aacute;cil. Lo interesante del problema es qu&eacute; lo detiene cuando se equivoca.</p>
+    <div class="links">
+      <a class="btn" href="https://github.com/LuisMata12/CausaOps" target="_blank" rel="noopener">Ver c&oacute;digo en GitHub</a>
+      <span class="note">Corre en local con Docker Compose. La demo p&uacute;blica llega en la Fase 7.</span>
+    </div>
+    <dl class="facts">
+      <div><dt>Rol</dt><dd>Dise&ntilde;o y desarrollo completo</dd></div>
+      <div><dt>Backend</dt><dd>FastAPI &middot; PostgreSQL</dd></div>
+      <div><dt>Frontend</dt><dd>Next.js &middot; TypeScript</dd></div>
+      <div><dt>Inferencia</dt><dd>Groq GPT-OSS 120B</dd></div>
+      <div><dt>Estado</dt><dd>Fase 4 de 7</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <div class="col">
+      <div class="tag"><i></i><span>El problema</span></div>
+      <h2>Una recomendaci&oacute;n que no puedes auditar no sirve de nada</h2>
+      <div class="body">
+        <p>Cuando un servicio se degrada a las tres de la ma&ntilde;ana, la pregunta no es qu&eacute; opina un modelo. Es <strong>en qu&eacute; se basa</strong>, y si alguien puede comprobarlo antes de tocar producci&oacute;n.</p>
+        <p>La mayor&iacute;a de las integraciones de IA en operaciones pegan los logs en un prompt y muestran el p&aacute;rrafo que sale. Si el modelo cita un despliegue que no existe, nadie se entera: el texto suena igual de convincente.</p>
+        <p>CausaOps est&aacute; construido alrededor de la restricci&oacute;n contraria. El modelo recibe un conjunto cerrado de hechos, cada uno con su identificador, y <strong>el backend rechaza cualquier respuesta que cite algo que no le entreg&oacute;</strong>. No es una instrucci&oacute;n en el prompt. Es una comprobaci&oacute;n en el c&oacute;digo.</p>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <p class="n">01</p>
+        <h3>Los hechos van antes que la inferencia</h3>
+        <p>La API valida y persiste la telemetr&iacute;a cruda antes de aplicar ninguna regla, y las reglas corren antes de que exista un diagn&oacute;stico.</p>
+        <p class="echo">Si el proveedor de IA cae, la detecci&oacute;n sigue funcionando.</p>
+      </div>
+      <div class="card">
+        <p class="n">02</p>
+        <h3>El backend verifica cada cita</h3>
+        <p>Toda afirmaci&oacute;n del modelo debe referenciar identificadores de evidencia reales. El backend los compara contra los que envi&oacute;.</p>
+        <p class="echo">Un JSON perfectamente v&aacute;lido que cita un id inventado se rechaza igual.</p>
+      </div>
+      <div class="card">
+        <p class="n">03</p>
+        <h3>El silencio no es recuperaci&oacute;n</h3>
+        <p>Un incidente no se cierra porque dejen de llegar errores. Se cierra cuando llega telemetr&iacute;a nueva que demuestra salud.</p>
+        <p class="echo">Un servicio ca&iacute;do del todo tambi&eacute;n deja de reportar fallos.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="tag"><i></i><span>Arquitectura</span></div>
+      <h2>Un monolito modular, a prop&oacute;sito</h2>
+      <div class="body">
+        <p>Cinco servicios en Docker Compose: la web, la API, PostgreSQL, un servicio de pagos de demostraci&oacute;n que sabe romperse a voluntad, y un detector que corre aparte.</p>
+        <p>La decisi&oacute;n est&aacute; documentada como ADR. El MVP necesitaba un ciclo de incidente completo y auditable, no escalado independiente de muchos servicios. Una sola transacci&oacute;n de base de datos preserva los invariantes del incidente, y los l&iacute;mites de dominio viven en m&oacute;dulos de Python, listos para extraerse si alg&uacute;n d&iacute;a hace falta.</p>
+        <p>Las integraciones externas, el proveedor de LLM y el ejecutor de acciones, viven detr&aacute;s de interfaces estrechas. <strong>Ninguna de las dos posee el estado del incidente.</strong></p>
+      </div>
+    </div>
+    <figure class="fig">
+      <div class="scroller"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 680" role="img" aria-label="Arquitectura de CausaOps: el navegador solo habla con la aplicacion Next.js, que llama a la API FastAPI; la API es el unico componente que accede a PostgreSQL y a Groq.">
+  <defs>
+    <marker id="a-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9aa6b2"/></marker>
+    <marker id="a-blu" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#75a8ff"/></marker>
+    <marker id="a-lim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b7f34a"/></marker>
+  </defs>
+  
+  <g font-family="ui-sans-serif,-apple-system,'Helvetica Neue',Arial,sans-serif">
+    <text x="40" y="40" fill="#f3f6f8" font-size="22" font-weight="700">CausaOps &#183; Arquitectura del sistema</text>
+    <text x="40" y="64" fill="#9aa6b2" font-size="13">Monolito modular: una API, una base de datos. Las integraciones externas viven detr&#225;s de interfaces estrechas.</text>
+
+    <line x1="258" y1="96" x2="258" y2="600" stroke="#27303b" stroke-width="1.5" stroke-dasharray="5 5"/>
+    <text x="240" y="112" fill="#9aa6b2" font-size="10.5" letter-spacing="1.2" text-anchor="end">NAVEGADOR</text>
+    <text x="276" y="112" fill="#9aa6b2" font-size="10.5" letter-spacing="1.2">SERVIDOR &#183; RED PRIVADA</text>
+
+    <g>
+      <rect x="40" y="306" width="180" height="76" rx="10" fill="#11161d" stroke="#27303b" stroke-width="1.5"/>
+      <text x="130" y="338" fill="#f3f6f8" font-size="14.5" font-weight="700" text-anchor="middle">Navegador</text>
+      <text x="130" y="358" fill="#9aa6b2" font-size="11" text-anchor="middle">solo HTML y JSON</text>
+    </g>
+    <g>
+      <rect x="300" y="306" width="180" height="76" rx="10" fill="#11161d" stroke="#27303b" stroke-width="1.5"/>
+      <text x="390" y="332" fill="#f3f6f8" font-size="14.5" font-weight="700" text-anchor="middle">Next.js web</text>
+      <text x="390" y="351" fill="#9aa6b2" font-size="11" text-anchor="middle">React Server Components</text>
+      <text x="390" y="368" fill="#9aa6b2" font-size="10.5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" text-anchor="middle">:3000</text>
+    </g>
+    <g>
+      <rect x="560" y="306" width="184" height="76" rx="10" fill="#11161d" stroke="#b7f34a" stroke-width="1.8"/>
+      <text x="652" y="332" fill="#f3f6f8" font-size="14.5" font-weight="700" text-anchor="middle">FastAPI</text>
+      <text x="652" y="351" fill="#9aa6b2" font-size="11" text-anchor="middle">ingesta &#183; incidentes &#183; diagn&#243;stico</text>
+      <text x="652" y="368" fill="#9aa6b2" font-size="10.5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" text-anchor="middle">:8000</text>
+    </g>
+    <g>
+      <rect x="840" y="306" width="180" height="76" rx="10" fill="#11161d" stroke="#27303b" stroke-width="1.5"/>
+      <text x="930" y="332" fill="#f3f6f8" font-size="14.5" font-weight="700" text-anchor="middle">PostgreSQL</text>
+      <text x="930" y="351" fill="#9aa6b2" font-size="11" text-anchor="middle">sistema de registro</text>
+      <text x="930" y="368" fill="#9aa6b2" font-size="10.5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" text-anchor="middle">:5432</text>
+    </g>
+    <g>
+      <rect x="300" y="126" width="180" height="76" rx="10" fill="#11161d" stroke="#27303b" stroke-width="1.5"/>
+      <text x="390" y="152" fill="#f3f6f8" font-size="14.5" font-weight="700" text-anchor="middle">Demo Payments</text>
+      <text x="390" y="171" fill="#9aa6b2" font-size="11" text-anchor="middle">modos stable / timeout</text>
+      <text x="390" y="188" fill="#9aa6b2" font-size="10.5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" text-anchor="middle">:8100</text>
+    </g>
+    <g>
+      <rect x="840" y="126" width="180" height="76" rx="10" fill="#11161d" stroke="#75a8ff" stroke-width="1.8" stroke-dasharray="6 4"/>
+      <text x="930" y="152" fill="#f3f6f8" font-size="14.5" font-weight="700" text-anchor="middle">Groq</text>
+      <text x="930" y="171" fill="#75a8ff" font-size="11" text-anchor="middle">gpt-oss-120b / 20b</text>
+      <text x="930" y="188" fill="#9aa6b2" font-size="10.5" text-anchor="middle">sin estado, sin herramientas</text>
+    </g>
+    <g>
+      <rect x="840" y="486" width="180" height="76" rx="10" fill="#11161d" stroke="#b7f34a" stroke-width="1.8"/>
+      <text x="930" y="512" fill="#f3f6f8" font-size="14.5" font-weight="700" text-anchor="middle">Detector</text>
+      <text x="930" y="531" fill="#9aa6b2" font-size="11" text-anchor="middle">proceso aparte, sin cola</text>
+      <text x="930" y="548" fill="#9aa6b2" font-size="10.5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" text-anchor="middle">app.detect --loop</text>
+    </g>
+
+    <line x1="224" y1="344" x2="294" y2="344" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#a-mut)"/>
+    <text x="259" y="334" fill="#9aa6b2" font-size="10.5" text-anchor="middle">HTTP</text>
+    <line x1="484" y1="344" x2="554" y2="344" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#a-mut)"/>
+    <text x="519" y="334" fill="#9aa6b2" font-size="10.5" text-anchor="middle">fetch SSR</text>
+    <line x1="748" y1="344" x2="834" y2="344" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#a-mut)"/>
+    <text x="791" y="334" fill="#9aa6b2" font-size="10.5" text-anchor="middle">lee / escribe</text>
+
+    <polyline points="390,206 390,256 600,256 600,300" fill="none" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#a-mut)"/>
+    <text x="500" y="248" fill="#9aa6b2" font-size="10.5" text-anchor="middle">POST telemetr&#237;a &#183; deploys  (best-effort)</text>
+
+    <polyline points="700,302 700,150 834,150" fill="none" stroke="#75a8ff" stroke-width="1.6" marker-end="url(#a-blu)"/>
+    <text x="690" y="228" fill="#75a8ff" font-size="10.5" text-anchor="end">snapshot curado</text>
+    <polyline points="840,178 724,178 724,300" fill="none" stroke="#75a8ff" stroke-width="1.6" marker-end="url(#a-blu)"/>
+    <text x="736" y="252" fill="#75a8ff" font-size="10.5">JSON validado</text>
+
+    <line x1="930" y1="482" x2="930" y2="388" stroke="#b7f34a" stroke-width="1.6" marker-end="url(#a-lim)"/>
+    <text x="918" y="432" fill="#b7f34a" font-size="10.5" text-anchor="end">cada 30 s</text>
+    <text x="918" y="448" fill="#9aa6b2" font-size="10.5" text-anchor="end">abre y cierra incidentes</text>
+
+    <g font-size="11">
+      <rect x="40" y="624" width="14" height="3" rx="1.5" fill="#b7f34a"/>
+      <text x="62" y="630" fill="#9aa6b2">hechos deterministas</text>
+      <rect x="230" y="624" width="14" height="3" rx="1.5" fill="#75a8ff"/>
+      <text x="252" y="630" fill="#9aa6b2">inferencia IA</text>
+      <rect x="390" y="624" width="14" height="3" rx="1.5" fill="#75a8ff" opacity="0.5"/>
+      <text x="412" y="630" fill="#9aa6b2">borde discontinuo = servicio externo</text>
+      <text x="1040" y="630" fill="#9aa6b2" text-anchor="end">El navegador nunca habla con PostgreSQL ni con el LLM.</text>
+    </g>
+  </g>
+</svg></div>
+      <figcaption>El navegador solo habla con la aplicaci&oacute;n Next.js. La API es el &uacute;nico componente que toca la base de datos o el modelo, y es donde vive toda la validaci&oacute;n.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="tag"><i></i><span>El ciclo</span></div>
+      <h2>Ocho etapas, y la IA solo ocupa una</h2>
+      <div class="body">
+        <p>El detector eval&uacute;a cada servicio sobre una ventana m&oacute;vil de cinco minutos: tasa de error por encima del 10&nbsp;%, p95 por encima de 2000&nbsp;ms, o tres fallos de health check. Exige un m&iacute;nimo de muestras antes de disparar, para que un &uacute;nico error aislado no abra un incidente.</p>
+        <p>Cuando varias reglas se activan a la vez se convierten en se&ntilde;ales del mismo incidente, nunca en alertas paralelas. El despliegue m&aacute;s reciente se correlaciona solo si precede a la detecci&oacute;n dentro de la ventana configurada, y eso sube la severidad sin afirmar que sea la causa.</p>
+        <p>Las etapas de aprobaci&oacute;n humana y rollback simulado son la Fase 5, que a&uacute;n no est&aacute; construida. Aparecen en el diagrama porque la m&aacute;quina de estados ya tiene los huecos reservados.</p>
+      </div>
+    </div>
+    <figure class="fig">
+      <div class="scroller"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 620" role="img" aria-label="Ciclo de vida de un incidente en CausaOps: telemetria, hechos persistidos, reglas deterministas, incidente con evidencia, diagnostico Groq, aprobacion humana y rollback simulado pendientes de la fase 5, y verificacion de recuperacion que realimenta al detector.">
+  <defs>
+    <marker id="b-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9aa6b2"/></marker>
+    <marker id="b-lim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b7f34a"/></marker>
+  </defs>
+  
+  <g font-family="ui-sans-serif,-apple-system,'Helvetica Neue',Arial,sans-serif">
+    <text x="60" y="38" fill="#f3f6f8" font-size="22" font-weight="700">Ciclo de vida de un incidente</text>
+    <text x="60" y="62" fill="#9aa6b2" font-size="13">Los hechos deterministas y la inferencia de IA son etapas separadas. La IA nunca escribe estado del incidente.</text>
+
+    <polyline points="1360,396 1392,396 1392,88 880,88 880,118" fill="none" stroke="#b7f34a" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#b-lim)"/>
+    <text x="1130" y="80" fill="#b7f34a" font-size="11" text-anchor="middle">el detector reeval&#250;a la ventana cada 30 s</text>
+
+    <g>
+      <rect x="60" y="124" width="280" height="112" rx="12" fill="#11161d" stroke="#b7f34a" stroke-width="1.6"/>
+      <text x="80" y="152" fill="#b7f34a" font-size="10" letter-spacing="1.2">01 &#183; INGESTA</text>
+      <text x="80" y="176" fill="#f3f6f8" font-size="15.5" font-weight="700">Telemetr&#237;a</text>
+      <text x="80" y="198" fill="#9aa6b2" font-size="11">Eventos, m&#233;tricas y deploys versionados</text>
+      <text x="80" y="215" fill="#9aa6b2" font-size="11">llegan del servicio demo.</text>
+    </g>
+    <g>
+      <rect x="400" y="124" width="280" height="112" rx="12" fill="#11161d" stroke="#b7f34a" stroke-width="1.6"/>
+      <text x="420" y="152" fill="#b7f34a" font-size="10" letter-spacing="1.2">02 &#183; PERSISTENCIA</text>
+      <text x="420" y="176" fill="#f3f6f8" font-size="15.5" font-weight="700">Hechos crudos</text>
+      <text x="420" y="198" fill="#9aa6b2" font-size="11">La API valida y guarda el hecho</text>
+      <text x="420" y="215" fill="#9aa6b2" font-size="11">antes de aplicar ninguna regla.</text>
+    </g>
+    <g>
+      <rect x="740" y="124" width="280" height="112" rx="12" fill="#11161d" stroke="#b7f34a" stroke-width="1.6"/>
+      <text x="760" y="152" fill="#b7f34a" font-size="10" letter-spacing="1.2">03 &#183; REGLAS</text>
+      <text x="760" y="176" fill="#f3f6f8" font-size="15.5" font-weight="700">Detecci&#243;n determinista</text>
+      <text x="760" y="198" fill="#9aa6b2" font-size="11">error &gt; 10 % &#183; p95 &gt; 2000 ms &#183; 3 health fails</text>
+      <text x="760" y="215" fill="#9aa6b2" font-size="11">en una ventana m&#243;vil de 5 min.</text>
+    </g>
+    <g>
+      <rect x="1080" y="124" width="280" height="112" rx="12" fill="#11161d" stroke="#b7f34a" stroke-width="1.6"/>
+      <text x="1100" y="152" fill="#b7f34a" font-size="10" letter-spacing="1.2">04 &#183; CORRELACI&#211;N</text>
+      <text x="1100" y="176" fill="#f3f6f8" font-size="15.5" font-weight="700">Incidente + evidencia</text>
+      <text x="1100" y="198" fill="#9aa6b2" font-size="11">Uno abierto por servicio. El deploy reciente</text>
+      <text x="1100" y="215" fill="#9aa6b2" font-size="11">sube la severidad, no explica la causa.</text>
+    </g>
+
+    <line x1="344" y1="180" x2="394" y2="180" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#b-mut)"/>
+    <line x1="684" y1="180" x2="734" y2="180" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#b-mut)"/>
+    <line x1="1024" y1="180" x2="1074" y2="180" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#b-mut)"/>
+    <polyline points="1220,240 1220,286 200,286 200,334" fill="none" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#b-mut)"/>
+
+    <g>
+      <rect x="60" y="340" width="280" height="112" rx="12" fill="#11161d" stroke="#75a8ff" stroke-width="1.6"/>
+      <text x="80" y="368" fill="#75a8ff" font-size="10" letter-spacing="1.2">05 &#183; INFERENCIA</text>
+      <text x="80" y="392" fill="#f3f6f8" font-size="15.5" font-weight="700">Diagn&#243;stico Groq</text>
+      <text x="80" y="414" fill="#9aa6b2" font-size="11">Snapshot curado, schema estricto y</text>
+      <text x="80" y="431" fill="#9aa6b2" font-size="11">cada cita verificada por el backend.</text>
+    </g>
+    <g>
+      <rect x="400" y="340" width="280" height="112" rx="12" fill="#11161d" stroke="#27303b" stroke-width="1.6" stroke-dasharray="6 4"/>
+      <rect x="592" y="352" width="72" height="18" rx="9" fill="#27303b"/>
+      <text x="628" y="365" fill="#9aa6b2" font-size="9.5" letter-spacing="0.8" text-anchor="middle">FASE 5</text>
+      <text x="420" y="368" fill="#9aa6b2" font-size="10" letter-spacing="1.2">06 &#183; CONTROL</text>
+      <text x="420" y="392" fill="#9aa6b2" font-size="15.5" font-weight="700">Aprobaci&#243;n humana</text>
+      <text x="420" y="414" fill="#9aa6b2" font-size="11">Una acci&#243;n de allow-list, nunca</text>
+      <text x="420" y="431" fill="#9aa6b2" font-size="11">comandos ni URLs arbitrarias.</text>
+    </g>
+    <g>
+      <rect x="740" y="340" width="280" height="112" rx="12" fill="#11161d" stroke="#27303b" stroke-width="1.6" stroke-dasharray="6 4"/>
+      <rect x="932" y="352" width="72" height="18" rx="9" fill="#27303b"/>
+      <text x="968" y="365" fill="#9aa6b2" font-size="9.5" letter-spacing="0.8" text-anchor="middle">FASE 5</text>
+      <text x="760" y="368" fill="#9aa6b2" font-size="10" letter-spacing="1.2">07 &#183; ACCI&#211;N</text>
+      <text x="760" y="392" fill="#9aa6b2" font-size="15.5" font-weight="700">Rollback simulado</text>
+      <text x="760" y="414" fill="#9aa6b2" font-size="11">Ejecutor detr&#225;s de una interfaz</text>
+      <text x="760" y="431" fill="#9aa6b2" font-size="11">estrecha, igual que el proveedor LLM.</text>
+    </g>
+    <g>
+      <rect x="1080" y="340" width="280" height="112" rx="12" fill="#11161d" stroke="#b7f34a" stroke-width="1.6"/>
+      <text x="1100" y="368" fill="#b7f34a" font-size="10" letter-spacing="1.2">08 &#183; CIERRE</text>
+      <text x="1100" y="392" fill="#f3f6f8" font-size="15.5" font-weight="700">Recuperaci&#243;n verificada</text>
+      <text x="1100" y="414" fill="#9aa6b2" font-size="11">Exige muestras nuevas y sanas.</text>
+      <text x="1100" y="431" fill="#b7f34a" font-size="11">El silencio no es recuperaci&#243;n.</text>
+    </g>
+
+    <line x1="344" y1="396" x2="394" y2="396" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#b-mut)"/>
+    <line x1="684" y1="396" x2="734" y2="396" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#b-mut)"/>
+    <line x1="1024" y1="396" x2="1074" y2="396" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#b-mut)"/>
+
+    <g font-size="11">
+      <rect x="60" y="528" width="14" height="3" rx="1.5" fill="#b7f34a"/>
+      <text x="82" y="534" fill="#9aa6b2">etapa determinista &#183; implementada</text>
+      <rect x="330" y="528" width="14" height="3" rx="1.5" fill="#75a8ff"/>
+      <text x="352" y="534" fill="#9aa6b2">etapa de IA &#183; implementada</text>
+      <rect x="570" y="528" width="14" height="3" rx="1.5" fill="#27303b"/>
+      <text x="592" y="534" fill="#9aa6b2">pendiente &#183; fase 5</text>
+      <text x="1360" y="534" fill="#9aa6b2" text-anchor="end">Las etapas 01-05 y 08 funcionan hoy. El bucle se cierra con la fase 5.</text>
+    </g>
+  </g>
+</svg></div>
+      <figcaption>En verde lo determinista, en azul la inferencia, y en gris lo que espera a la Fase 5. El bucle se cierra solo: el detector reeval&uacute;a la ventana cada treinta segundos.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="tag"><i></i><span>El mecanismo</span></div>
+      <h2>C&oacute;mo se impide que el modelo invente</h2>
+      <div class="body">
+        <p>El backend arma un snapshot con la identidad del incidente, el an&aacute;lisis determinista, el despliegue correlacionado, las acciones permitidas y hasta treinta registros de evidencia. <strong>Cada registro lleva su UUID persistido.</strong> El contenido de los logs viaja marcado como dato no confiable, nunca como instrucci&oacute;n.</p>
+        <p>El modelo recibe ese JSON y el esquema de respuesta en modo estricto. No tiene base de datos, ni shell, ni navegador, ni herramientas, ni memoria entre llamadas. Devuelve un objeto y nada m&aacute;s.</p>
+        <p>Entonces el backend vuelve a comprobarlo todo: que la respuesta cumple el esquema, que cada <code>evidence_id</code> citado estaba en el snapshot, y que la acci&oacute;n recomendada pertenece a la allow-list. Si alguna falla, el intento se guarda como rechazado con su motivo y el incidente no cambia de estado.</p>
+        <p>El indicador de revisi&oacute;n humana lo a&ntilde;ade el backend a cada resultado aceptado. <strong>Nunca es una decisi&oacute;n del modelo.</strong></p>
+      </div>
+    </div>
+    <figure class="fig">
+      <div class="scroller"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 740" role="img" aria-label="Mecanismo de vinculacion a evidencia: el backend arma un snapshot con identificadores de evidencia persistidos, Groq responde un JSON estricto, y el backend acepta el diagnostico solo si cumple el esquema, cita unicamente evidencia suministrada y recomienda una accion de la allow-list.">
+  <defs>
+    <marker id="c-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9aa6b2"/></marker>
+    <marker id="c-blu" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#75a8ff"/></marker>
+    <marker id="c-lim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b7f34a"/></marker>
+    <marker id="c-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ff7474"/></marker>
+  </defs>
+  
+  <g font-family="ui-sans-serif,-apple-system,'Helvetica Neue',Arial,sans-serif">
+    <text x="40" y="40" fill="#f3f6f8" font-size="22" font-weight="700">C&#243;mo se impide que el modelo invente</text>
+    <text x="40" y="64" fill="#9aa6b2" font-size="13">El modelo no puede citar nada que el backend no le haya entregado. Es una comprobaci&#243;n, no una instrucci&#243;n del prompt.</text>
+
+    <g>
+      <rect x="40" y="130" width="250" height="190" rx="12" fill="#11161d" stroke="#27303b" stroke-width="1.5"/>
+      <text x="60" y="158" fill="#9aa6b2" font-size="10" letter-spacing="1.2">POSTGRESQL</text>
+      <text x="60" y="182" fill="#f3f6f8" font-size="15" font-weight="700">Evidencia del incidente</text>
+      <g font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" fill="#9aa6b2">
+        <text x="60" y="210">4ae2871c  telemetry_event</text>
+        <text x="60" y="230">2d09c36a  telemetry_event</text>
+        <text x="60" y="250">292b3c2b  deployment</text>
+        <text x="60" y="270">a1f0c7d4  deterministic_analysis</text>
+      </g>
+      <text x="60" y="298" fill="#9aa6b2" font-size="10.5">Cada fila tiene un UUID persistido.</text>
+    </g>
+
+    <line x1="294" y1="225" x2="346" y2="225" stroke="#9aa6b2" stroke-width="1.6" marker-end="url(#c-mut)"/>
+    <text x="320" y="214" fill="#9aa6b2" font-size="10" text-anchor="middle">&#8804; 30</text>
+
+    <g>
+      <rect x="350" y="130" width="250" height="190" rx="12" fill="#11161d" stroke="#b7f34a" stroke-width="1.8"/>
+      <text x="370" y="158" fill="#b7f34a" font-size="10" letter-spacing="1.2">ENTRADA CURADA</text>
+      <text x="370" y="182" fill="#f3f6f8" font-size="15" font-weight="700">Snapshot JSON</text>
+      <text x="370" y="208" fill="#9aa6b2" font-size="11">Identidad, an&#225;lisis determinista,</text>
+      <text x="370" y="225" fill="#9aa6b2" font-size="11">deploy correlacionado, acciones</text>
+      <text x="370" y="242" fill="#9aa6b2" font-size="11">permitidas y evidencia con su id.</text>
+      <text x="370" y="268" fill="#ff7474" font-size="11">Los logs viajan como datos</text>
+      <text x="370" y="285" fill="#ff7474" font-size="11">no confiables, nunca como &#243;rdenes.</text>
+      <text x="370" y="306" fill="#9aa6b2" font-size="10.5">La API key jam&#225;s entra aqu&#237;.</text>
+    </g>
+
+    <line x1="604" y1="225" x2="656" y2="225" stroke="#75a8ff" stroke-width="1.6" marker-end="url(#c-blu)"/>
+    <text x="630" y="214" fill="#75a8ff" font-size="10" text-anchor="middle">strict</text>
+
+    <g>
+      <rect x="660" y="130" width="250" height="190" rx="12" fill="#11161d" stroke="#75a8ff" stroke-width="1.8" stroke-dasharray="6 4"/>
+      <text x="680" y="158" fill="#75a8ff" font-size="10" letter-spacing="1.2">PROVEEDOR EXTERNO</text>
+      <text x="680" y="182" fill="#f3f6f8" font-size="15" font-weight="700">Groq gpt-oss-120b</text>
+      <text x="680" y="212" fill="#9aa6b2" font-size="11">Sin base de datos. Sin shell.</text>
+      <text x="680" y="229" fill="#9aa6b2" font-size="11">Sin navegador. Sin herramientas.</text>
+      <text x="680" y="246" fill="#9aa6b2" font-size="11">Sin memoria entre llamadas.</text>
+      <text x="680" y="276" fill="#75a8ff" font-size="11">Recibe un JSON y devuelve un JSON.</text>
+      <text x="680" y="300" fill="#9aa6b2" font-size="10.5">No puede ejecutar la acci&#243;n que propone.</text>
+    </g>
+
+    <polyline points="785,324 785,352 600,352 600,386" fill="none" stroke="#75a8ff" stroke-width="1.6" marker-end="url(#c-blu)"/>
+    <text x="692" y="344" fill="#75a8ff" font-size="10.5" text-anchor="middle">respuesta JSON</text>
+
+    <g>
+      <rect x="330" y="390" width="540" height="172" rx="12" fill="#11161d" stroke="#f3f6f8" stroke-width="1.8"/>
+      <text x="356" y="418" fill="#f3f6f8" font-size="10" letter-spacing="1.2">EL BACKEND VUELVE A COMPROBAR TODO</text>
+      <text x="356" y="444" fill="#f3f6f8" font-size="15" font-weight="700">Validaci&#243;n</text>
+      <g font-size="11.5" fill="#9aa6b2">
+        <text x="356" y="476"><tspan fill="#b7f34a" font-weight="700">1</tspan>   &#191;La respuesta cumple el esquema Pydantic?</text>
+        <text x="356" y="502"><tspan fill="#b7f34a" font-weight="700">2</tspan>   &#191;Cada evidence_id citado estaba en el snapshot?</text>
+        <text x="356" y="528"><tspan fill="#b7f34a" font-weight="700">3</tspan>   &#191;La acci&#243;n recomendada est&#225; en la allow-list?</text>
+      </g>
+    </g>
+
+    <polyline points="420,566 420,600 250,600 250,634" fill="none" stroke="#ff7474" stroke-width="1.6" marker-end="url(#c-red)"/>
+    <text x="330" y="592" fill="#ff7474" font-size="10.5" text-anchor="middle">falla una</text>
+    <polyline points="780,566 780,600 950,600 950,634" fill="none" stroke="#b7f34a" stroke-width="1.6" marker-end="url(#c-lim)"/>
+    <text x="872" y="592" fill="#b7f34a" font-size="10.5" text-anchor="middle">pasan las tres</text>
+
+    <g>
+      <rect x="110" y="638" width="280" height="76" rx="12" fill="#11161d" stroke="#ff7474" stroke-width="1.8"/>
+      <text x="130" y="664" fill="#ff7474" font-size="13.5" font-weight="700">Rechazado</text>
+      <text x="130" y="684" fill="#9aa6b2" font-size="10.5">Se guarda el motivo para auditor&#237;a.</text>
+      <text x="130" y="701" fill="#9aa6b2" font-size="10.5">El incidente no cambia de estado.</text>
+    </g>
+    <g>
+      <rect x="810" y="638" width="300" height="76" rx="12" fill="#11161d" stroke="#b7f34a" stroke-width="1.8"/>
+      <text x="830" y="664" fill="#b7f34a" font-size="13.5" font-weight="700">Aceptado</text>
+      <text x="830" y="684" fill="#9aa6b2" font-size="10.5">Se persiste con modelo, latencia y tokens.</text>
+      <text x="830" y="701" fill="#f3f6f8" font-size="10.5">El backend fuerza needs_human_review.</text>
+    </g>
+
+    <line x1="40" y1="432" x2="40" y2="508" stroke="#ff7474" stroke-width="2"/>
+    <text x="58" y="448" fill="#f3f6f8" font-size="11.5" font-weight="700">El caso que importa</text>
+    <text x="58" y="470" fill="#9aa6b2" font-size="11">Una respuesta bien formada que</text>
+    <text x="58" y="487" fill="#9aa6b2" font-size="11">cita un id inventado se rechaza</text>
+    <text x="58" y="504" fill="#ff7474" font-size="11">igual: la comprobaci&#243;n 2 falla.</text>
+  </g>
+</svg></div>
+      <figcaption>La comprobaci&oacute;n 2 es la que hace el trabajo. Una respuesta bien formada y plausible que cita un identificador inventado se rechaza exactamente igual que un JSON roto.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="tag"><i></i><span>Funcionando</span></div>
+      <h2>Una ejecuci&oacute;n real, de principio a fin</h2>
+      <div class="body">
+        <p>El servicio de demostraci&oacute;n cambia a modo <code>timeout</code>, lo que queda registrado como un despliegue. Seis pagos fallan. El detector abre un incidente, lo correlaciona con ese despliegue y recoge la evidencia. Desde el detalle del incidente se pide el diagn&oacute;stico.</p>
+        <p>Estas son las cifras de esa ejecuci&oacute;n, no una maqueta:</p>
+      </div>
+    </div>
+
+    <dl class="run">
+      <div class="bad"><dt>Tasa de error</dt><dd>42,9&nbsp;%<small>6 de 14 peticiones</small></dd></div>
+      <div class="bad"><dt>Latencia p95</dt><dd>2506<small>milisegundos</small></dd></div>
+      <div><dt>Severidad</dt><dd>high<small>por correlaci&oacute;n de deploy</small></dd></div>
+      <div class="ok"><dt>Evidencias</dt><dd>3 / 3<small>citadas y validadas</small></dd></div>
+      <div class="ai"><dt>Modelo</dt><dd>120B<small>openai/gpt-oss-120b</small></dd></div>
+      <div class="ai"><dt>Respuesta</dt><dd>3890<small>ms, 2630 tokens</small></dd></div>
+      <div class="ok"><dt>Confianza</dt><dd>0.90<small>declarada por el modelo</small></dd></div>
+      <div class="ok"><dt>Revisi&oacute;n</dt><dd>S&iacute;<small>forzada por el backend</small></dd></div>
+    </dl>
+
+    <div class="shots">
+      <figure class="shot">
+        <div class="bar"><b></b><b></b><b></b><span>localhost:3000/incidents/1e71dd6a</span></div>
+        <button type="button" data-src="/causaops/03-incident-detail.jpg" data-label="Detalle del incidente">
+          <img src="/causaops/03-incident-detail.jpg" alt="Detalle del incidente con hechos verificados, diagn&oacute;stico de Groq y l&iacute;nea de tiempo de evidencia">
+        </button>
+        <figcaption><b>Detalle del incidente</b>Los hechos deterministas y el diagn&oacute;stico de IA ocupan paneles separados. Abajo, la evidencia con sus identificadores.</figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="bar"><b></b><b></b><b></b><span>localhost:3000</span></div>
+        <button type="button" data-src="/causaops/01-overview.jpg" data-label="Panel general">
+          <img src="/causaops/01-overview.jpg" alt="Panel general con incidentes activos y estado de los servicios">
+        </button>
+        <figcaption><b>Panel general</b>Incidentes activos y estado de los tres servicios, todo calculado en el backend.</figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="bar"><b></b><b></b><b></b><span>localhost:3000/incidents</span></div>
+        <button type="button" data-src="/causaops/02-incidents-list.jpg" data-label="Historial de incidentes">
+          <img src="/causaops/02-incidents-list.jpg" alt="Historial de incidentes con filtros por estado, severidad y servicio">
+        </button>
+        <figcaption><b>Historial</b>Filtrable por estado, severidad y servicio. Una degradaci&oacute;n abierta por servicio como m&aacute;ximo.</figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="bar"><b></b><b></b><b></b><span>localhost:8000/docs</span></div>
+        <button type="button" data-src="/causaops/04-api-docs.jpg" data-label="API">
+          <img src="/causaops/04-api-docs.jpg" alt="Documentaci&oacute;n OpenAPI generada por FastAPI">
+        </button>
+        <figcaption><b>API</b>Ingesta, detecci&oacute;n y diagn&oacute;stico expuestos como una API versionada con OpenAPI 3.1.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="two">
+      <div>
+        <div class="tag"><i></i><span>Construido con</span></div>
+        <dl class="rows">
+          <div class="row"><dt>API</dt><dd>FastAPI, SQLAlchemy 2.0, Pydantic v2, Alembic</dd></div>
+          <div class="row"><dt>Datos</dt><dd>PostgreSQL, siete tablas, migraciones versionadas</dd></div>
+          <div class="row"><dt>Web</dt><dd>Next.js App Router, React Server Components, TypeScript</dd></div>
+          <div class="row"><dt>Inferencia</dt><dd>Groq, GPT-OSS 120B y 20B, esquema JSON estricto</dd></div>
+          <div class="row"><dt>Entorno</dt><dd>Docker Compose, health checks, detector aparte</dd></div>
+          <div class="row"><dt>Calidad</dt><dd>pytest, ruff, ESLint, CI en tres jobs</dd></div>
+        </dl>
+      </div>
+      <div>
+        <div class="tag"><i></i><span>Estado</span></div>
+        <div class="phases">
+          <div class="ph done"><i>HECHO</i><span>Fundaciones y health checks</span></div>
+          <div class="ph done"><i>HECHO</i><span>Servicio demo y persistencia de telemetr&iacute;a</span></div>
+          <div class="ph done"><i>HECHO</i><span>Detecci&oacute;n determinista e interfaz de incidentes</span></div>
+          <div class="ph now"><i>ACTUAL</i><span>Evidencia y diagn&oacute;sticos validados</span></div>
+          <div class="ph"><i>FASE 5</i><span>Aprobaci&oacute;n humana, rollback simulado y verificaci&oacute;n</span></div>
+          <div class="ph"><i>FASE 6</i><span>Evaluaci&oacute;n, E2E, observabilidad y seguridad</span></div>
+          <div class="ph"><i>FASE 7</i><span>Pulido visual y demo p&uacute;blica</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Capturas tomadas del stack corriendo en local, con un incidente generado por el escenario controlado y un diagn&oacute;stico real del modelo de 120B.</p>
+    <p>Ninguna cifra de esta p&aacute;gina est&aacute; maquetada.</p>
+    <p>CausaOps &middot; por <a href="/index.html">Luis Mata</a> &middot; <a href="/projects.html">Ver todos los proyectos</a></p>
+  </footer>
+</div>
+
+<dialog id="viewer">
+  <div class="viewer-in">
+    <div class="viewer-top">
+      <p id="viewer-label"></p>
+      <button type="button" id="viewer-close">Cerrar &times;</button>
+    </div>
+    <img id="viewer-img" alt="">
+  </div>
+</dialog>
+
+<script>
+(function () {
+  var dlg = document.getElementById("viewer");
+  var img = document.getElementById("viewer-img");
+  var label = document.getElementById("viewer-label");
+
+  document.querySelectorAll(".shot button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      img.src = btn.dataset.src;
+      img.alt = btn.querySelector("img").alt;
+      label.textContent = btn.dataset.label;
+      if (typeof dlg.showModal === "function") {
+        dlg.showModal();
+      } else {
+        dlg.setAttribute("open", "");
+      }
+      dlg.querySelector(".viewer-in").scrollTop = 0;
+    });
+  });
+
+  document.getElementById("viewer-close").addEventListener("click", function () {
+    dlg.close ? dlg.close() : dlg.removeAttribute("open");
+  });
+
+  dlg.addEventListener("click", function (e) {
+    if (e.target === dlg || e.target.classList.contains("viewer-in")) {
+      dlg.close ? dlg.close() : dlg.removeAttribute("open");
+    }
+  });
+})();
+</script>
+
+  </body>
+</html>
