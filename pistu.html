@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Pistu — Caso de estudio · Luis Mata</title>
+    <meta name="description" content="Pistu: la lotería mexicana convertida en un juego multijugador de pistas en tiempo real. TypeScript, Colyseus, Phaser y Vite, con servidor autoritativo y $0 de infraestructura." />
+    <meta property="og:title" content="Pistu — juego multijugador de pistas" />
+    <meta property="og:description" content="Caso de estudio de Luis Mata: multijugador en tiempo real con Colyseus y Phaser." />
+    <meta property="og:image" content="https://my-portfolio-taupe-five-58.vercel.app/pistu/cover.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Figtree:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+  /* Single dark look on purpose: it is the game's own identity (docs/design). */
+  :root {
+    color-scheme: dark;
+    --bg: #1b1533;
+    --surface: #2a2250;
+    --surface-low: #221b44;
+    --border: #43397a;
+    --text: #f7f2ff;
+    --muted: #c9bee6;
+    --subtle: #9b90bd;
+    --pink: #e5337a;
+    --yellow: #f5b700;
+    --turq: #2ec4b6;
+    --cream: #fff4e0;
+    --ink: #1b1533;
+    --display: 'Bricolage Grotesque', 'Arial Rounded MT Bold', system-ui, sans-serif;
+    --body: Figtree, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.6 var(--body);
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 0 72px; }
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+  h2 { font-size: clamp(26px, 3.2vw, 34px); font-weight: 800; line-height: 1.1; }
+  h3 { font-size: 18px; font-weight: 800; }
+  p { margin: 0; }
+  a { color: var(--yellow); }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--turq); outline-offset: 3px; border-radius: 6px; }
+  .eyebrow { font: 600 12px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--turq); }
+  .lede { color: var(--muted); max-width: 62ch; }
+  section { display: grid; gap: 28px; padding-block: 56px 0; }
+  .section-head { display: grid; gap: 10px; }
+  code, .mono { font-family: var(--mono); font-size: .88em; }
+  code { background: var(--surface-low); border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px; }
+
+  /* Hero */
+  .banner { display: flex; gap: 6px; padding-top: 28px; }
+  .banner span { width: 34px; height: 22px; clip-path: polygon(0 0,100% 0,100% 70%,50% 100%,0 70%); }
+  .hero { display: grid; grid-template-columns: 1.05fr 1fr; gap: 32px; align-items: center; padding-block: 28px 8px; }
+  .hero h1 { font-size: clamp(64px, 10vw, 112px); line-height: .9; letter-spacing: -2px; }
+  .hero h1 span { color: var(--pink); }
+  .hero .pitch { font: 600 clamp(19px, 2.2vw, 23px)/1.35 var(--body); max-width: 30ch; margin-top: 18px; }
+  .hero .lede { margin-top: 14px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .chip { font: 600 13px/1 var(--body); padding: 8px 12px; border-radius: 999px; background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+  .live { margin-top: 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .live a.btn { display: inline-block; background: var(--pink); color: #fff; text-decoration: none; font-weight: 700; padding: 12px 18px; border-radius: 14px; }
+  .live .url { font-family: var(--mono); font-size: 14px; color: var(--subtle); user-select: all; }
+  .fan { position: relative; height: 520px; }
+  .fan img { position: absolute; width: 220px; top: 30px; border-radius: 26px; border: 2px solid var(--border); box-shadow: 0 24px 50px rgba(0,0,0,.45); }
+  .fan img:nth-child(1) { left: 2%; transform: rotate(-8deg); top: 70px; }
+  .fan img:nth-child(2) { left: 50%; transform: translateX(-50%); z-index: 2; top: 10px; }
+  .fan img:nth-child(3) { right: 2%; transform: rotate(8deg); top: 70px; }
+
+  /* Facts */
+  .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; margin-top: 40px; }
+  .fact { background: var(--surface-low); padding: 18px 20px; display: grid; gap: 4px; }
+  .fact b { font: 800 30px/1 var(--display); color: var(--yellow); font-variant-numeric: tabular-nums; }
+  .fact span { color: var(--muted); font-size: 14px; }
+
+  /* Flow */
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px 20px; }
+  .step { display: grid; gap: 12px; align-content: start; }
+  .step img { width: 100%; border-radius: 22px; border: 2px solid var(--border); }
+  .step .n { font: 500 12px/1 var(--mono); color: var(--yellow); }
+  .step h3 { margin-top: 2px; }
+  .step p { color: var(--muted); font-size: 14.5px; line-height: 1.5; }
+
+  /* Diagrams */
+  figure { margin: 0; display: grid; gap: 14px; }
+  .diagram { overflow-x: auto; background: var(--surface-low); border: 1px solid var(--border); border-radius: 18px; padding: 18px; }
+  .diagram svg { display: block; width: 100%; min-width: 760px; height: auto; color: var(--text); }
+  figcaption { color: var(--subtle); font-size: 14px; max-width: 75ch; }
+
+  /* Decisions */
+  .decisions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .decision { background: var(--surface-low); border: 1px solid var(--border); border-radius: 16px; padding: 20px 22px; display: grid; gap: 8px; align-content: start; }
+  .decision p { color: var(--muted); font-size: 15px; }
+  .decision .tag { font: 600 12px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; }
+
+  /* Testing table */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 16px; }
+  table { width: 100%; border-collapse: collapse; min-width: 560px; font-size: 15px; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font: 600 12px/1.2 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--subtle); background: var(--surface-low); }
+  tr:last-child td { border-bottom: 0; }
+  td.num { font-variant-numeric: tabular-nums; color: var(--yellow); font-weight: 700; white-space: nowrap; }
+  td:first-child { font-weight: 600; }
+
+  .share { display: grid; grid-template-columns: 300px 1fr; gap: 28px; align-items: center; }
+  .share img { width: 100%; border-radius: 18px; border: 2px solid var(--border); }
+  .next { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .next div { border-top: 3px solid var(--turq); padding-top: 12px; display: grid; gap: 6px; }
+  .next div:nth-child(2) { border-color: var(--yellow); }
+  .next div:nth-child(3) { border-color: var(--pink); }
+  .next p { color: var(--muted); font-size: 15px; }
+  img { max-width: 100%; }
+  .topnav { position: sticky; top: 0; z-index: 10; background: rgba(27,21,51,.88); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+  .topnav .inner { max-width: 1080px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .topnav a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 15px; }
+  .topnav a:hover { color: var(--yellow); }
+  .topnav .logo { font: 800 20px/1 var(--display); letter-spacing: .5px; }
+  .topnav .logo span { color: var(--pink); }
+  .topnav nav { display: flex; gap: 20px; }
+  .note { margin-top: 12px; font-size: 14px; color: var(--subtle); max-width: 52ch; }
+  .note b { color: var(--muted); }
+  .back { display: inline-block; margin-top: 18px; }
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--subtle); font-size: 14px; display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; }
+
+  @media (max-width: 880px) {
+    .hero { grid-template-columns: 1fr; }
+    .fan { height: 440px; }
+    .fan img { width: 180px; }
+    .flow { grid-template-columns: repeat(2, 1fr); }
+    .facts { grid-template-columns: repeat(2, 1fr); }
+    .decisions, .next, .share { grid-template-columns: 1fr; }
+    .share img { max-width: 300px; }
+  }
+  @media (max-width: 440px) {
+    .fan { height: 360px; }
+    .fan img { width: 140px; border-radius: 18px; }
+    .flow { gap: 24px 14px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fan img { transition: transform .35s ease; }
+    .fan:hover img:nth-child(1) { transform: rotate(-11deg) translateX(-8px); }
+    .fan:hover img:nth-child(3) { transform: rotate(11deg) translateX(8px); }
+  }
+</style>
+  </head>
+  <body>
+<header class="topnav">
+  <div class="inner">
+    <a href="/index.html" class="logo">LM<span>.</span></a>
+    <nav aria-label="Principal">
+      <a href="/projects.html">Proyectos</a>
+      <a href="/index.html#contact">Contacto</a>
+    </nav>
+  </div>
+</header>
+<div class="wrap">
+  <div class="banner" aria-hidden="true">
+    <span style="background: var(--pink)"></span><span style="background: var(--yellow)"></span><span style="background: var(--turq)"></span><span style="background: var(--pink)"></span><span style="background: var(--yellow)"></span>
+  </div>
+
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Caso de estudio · Juego multijugador web</p>
+      <h1>Pis<span>tu</span></h1>
+      <p class="pitch">La lotería mexicana convertida en un juego de pistas para jugar con amigos desde el celular.</p>
+      <p class="lede">En cada ronda, un jugador ve una carta secreta y escribe una pista de máximo 5 palabras sin usar las palabras prohibidas. Los demás marcan en su tabla la carta que creen que es. Gana quien suma más puntos; quien completa una línea grita ¡Lotería!</p>
+      <div class="meta">
+        <span class="chip">TypeScript</span><span class="chip">Colyseus 0.18</span><span class="chip">Phaser 3</span><span class="chip">Vite</span><span class="chip">Vitest</span><span class="chip">Render</span>
+      </div>
+      <div class="live">
+        <a class="btn" href="https://pistu-kr3e.onrender.com" target="_blank" rel="noopener">Jugar en línea</a>
+        <span class="url">pistu-kr3e.onrender.com</span>
+      </div>
+      <p class="note">El servidor corre en el plan gratuito de Render: si nadie ha jugado en un rato, la primera conexión puede tardar unos segundos en despertar. Para probarlo solo, abre la sala en dos o tres pestañas.</p>
+      <p class="note"><b>Código privado</b> mientras el juego se prepara para su lanzamiento. Con gusto lo muestro en una entrevista.</p>
+    </div>
+    <div class="fan" aria-label="Tres pantallas del juego: el gritón escribe su pista, los jugadores adivinan en su tabla y la revelación de la carta">
+      <img src="/pistu/03-griton.png" alt="Pantalla del gritón con su carta secreta, las palabras prohibidas y la pista validada">
+      <img src="/pistu/04-adivina.png" alt="Pantalla para adivinar: la pista arriba y la tabla de 3 por 3 con una carta seleccionada">
+      <img src="/pistu/06-revelacion.png" alt="Revelación de la carta con los puntos de cada jugador en la ronda">
+    </div>
+  </header>
+
+  <div class="facts">
+    <div class="fact"><b>3–8</b><span>jugadores por sala, sin cuenta</span></div>
+    <div class="fact"><b>~5 min</b><span>por partida</span></div>
+    <div class="fact"><b>24</b><span>cartas con ilustración original</span></div>
+    <div class="fact"><b>$0</b><span>de infraestructura al mes</span></div>
+  </div>
+
+  <section id="flujo">
+    <div class="section-head">
+      <p class="eyebrow">Flujo de una partida</p>
+      <h2>De un link de WhatsApp al marcador final</h2>
+      <p class="lede">Capturas de una partida real con cuatro jugadores. Las pantallas siguen al pie de la letra un set de diseños en HTML; solo la tabla de cartas y las animaciones se dibujan en un canvas de Phaser.</p>
+    </div>
+    <div class="flow">
+      <div class="step"><img src="/pistu/01-inicio.png" alt="Pantalla de inicio con campo de nombre, crear sala y unirse con código"><span class="n">01</span><h3>Inicio</h3><p>Escribes tu nombre y creas una sala, o pegas un código. No hay cuentas ni descargas.</p></div>
+      <div class="step"><img src="/pistu/02-sala.png" alt="Sala de espera con el código de la sala y cuatro jugadores"><span class="n">02</span><h3>Sala de espera</h3><p>Código de 6 caracteres, link para WhatsApp o para copiar. El anfitrión empieza con 3 o más jugadores.</p></div>
+      <div class="step"><img src="/pistu/03-griton.png" alt="El gritón ve la carta El Xolo y escribe una pista válida"><span class="n">03</span><h3>El gritón canta</h3><p>Solo él ve la carta. La pista se valida mientras escribe con las mismas reglas que aplica el servidor.</p></div>
+      <div class="step"><img src="/pistu/04-adivina.png" alt="Tabla de 3 por 3 con la carta El Metro seleccionada"><span class="n">04</span><h3>Adivinan</h3><p>Tienes 8 segundos. Tocas la carta y confirmas, o te arriesgas a decir que no la tienes. Fallar resta un punto.</p></div>
+      <div class="step"><img src="/pistu/05-esperando.png" alt="Pantalla de espera con frijoles animados y el marcador en vivo"><span class="n">05</span><h3>Esperando</h3><p>Mientras los demás eligen, el marcador en vivo muestra quién falta. Los frijoles se animan en Phaser.</p></div>
+      <div class="step"><img src="/pistu/06-revelacion.png" alt="Revelación: era El Alebrije, acertaste más dos"><span class="n">06</span><h3>Revelación</h3><p>La carta, tu resultado y lo que marcó cada jugador. El primero en acertar gana un punto extra.</p></div>
+      <div class="step"><img src="/pistu/07-votacion.png" alt="Votación de la mejor pista de la partida"><span class="n">07</span><h3>Votación</h3><p>Al cantar ¡Lotería!, todos votan la pista más ingeniosa. No puedes votar las tuyas. Vale dos puntos.</p></div>
+      <div class="step"><img src="/pistu/08-final.png" alt="Marcador final con la mejor pista y los botones de compartir y otra partida"><span class="n">08</span><h3>Final</h3><p>Marcador final, la mejor pista como imagen para compartir y «Otra partida» con los mismos jugadores.</p></div>
+    </div>
+  </section>
+
+  <section id="arquitectura">
+    <div class="section-head">
+      <p class="eyebrow">Arquitectura</p>
+      <h2>Un servidor que decide todo y clientes que solo muestran</h2>
+      <p class="lede">Monorepo con tres paquetes: <code>shared</code> (reglas puras), <code>server</code> (Colyseus) y <code>client</code> (Vite). El cliente nunca cambia el estado: manda intenciones, el servidor las valida con las reglas compartidas y todos reciben el estado nuevo.</p>
+    </div>
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 960 500" role="img" aria-label="Arquitectura de Pistu: el navegador descarga la app desde el sitio estático, manda intenciones al servidor Colyseus por WebSocket y recibe el estado sincronizado; la carta secreta llega solo al gritón; cliente y servidor importan las mismas reglas de shared; cada push a GitHub publica ambos servicios en Render.">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="currentColor"/></marker>
+            <marker id="arrow-pink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#e5337a"/></marker>
+          </defs>
+          <g font-family="Figtree, system-ui, sans-serif" font-size="13" fill="currentColor">
+            <!-- Browser -->
+            <rect x="20" y="20" width="300" height="460" rx="16" fill="#2a2250" stroke="#43397a" stroke-width="2"/>
+            <text x="40" y="50" font-size="15" font-weight="700">Navegador de cada jugador</text>
+            <rect x="40" y="70" width="260" height="96" rx="10" fill="#1b1533" stroke="#43397a"/>
+            <text x="56" y="96" font-weight="700" fill="#f5b700">Pantallas HTML/CSS</text>
+            <text x="56" y="118" fill="#c9bee6">Inicio, Sala, Gritón, Revelación,</text>
+            <text x="56" y="138" fill="#c9bee6">Final · copiadas de docs/design</text>
+            <rect x="40" y="180" width="260" height="78" rx="10" fill="#1b1533" stroke="#43397a"/>
+            <text x="56" y="206" font-weight="700" fill="#2ec4b6">Canvas Phaser</text>
+            <text x="56" y="228" fill="#c9bee6">Tabla 3×3 y animaciones,</text>
+            <text x="56" y="246" fill="#c9bee6">alineadas a huecos del HTML</text>
+            <rect x="40" y="272" width="260" height="78" rx="10" fill="#1b1533" stroke="#43397a"/>
+            <text x="56" y="298" font-weight="700">main.ts</text>
+            <text x="56" y="320" fill="#c9bee6">Elige pantalla según la fase</text>
+            <text x="56" y="338" fill="#c9bee6">del estado sincronizado</text>
+            <rect x="40" y="364" width="260" height="56" rx="10" fill="#1b1533" stroke="#43397a"/>
+            <text x="56" y="390" font-weight="700">Colyseus SDK</text>
+            <text x="56" y="408" fill="#c9bee6">Reconecta solo si se cae la señal</text>
+
+            <!-- Static site -->
+            <rect x="390" y="20" width="200" height="84" rx="12" fill="#2a2250" stroke="#43397a" stroke-width="2"/>
+            <text x="490" y="48" text-anchor="middle" font-weight="700">Render · sitio estático</text>
+            <text x="490" y="70" text-anchor="middle" fill="#c9bee6">CDN, siempre encendido</text>
+            <text x="490" y="90" text-anchor="middle" fill="#c9bee6">HTML, JS, 24 SVG</text>
+            <line x1="390" y1="62" x2="324" y2="62" stroke="currentColor" stroke-width="2" marker-end="url(#arrow)"/>
+            <text x="356" y="54" text-anchor="middle" font-size="12" fill="#c9bee6">carga</text>
+
+            <!-- GitHub -->
+            <rect x="680" y="20" width="200" height="56" rx="12" fill="none" stroke="#43397a" stroke-width="2" stroke-dasharray="6 5"/>
+            <text x="780" y="54" text-anchor="middle" font-weight="700">GitHub · main</text>
+            <line x1="680" y1="48" x2="594" y2="48" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+            <text x="637" y="40" text-anchor="middle" font-size="12" fill="#c9bee6">build</text>
+            <line x1="780" y1="76" x2="780" y2="146" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+            <text x="790" y="116" font-size="12" fill="#c9bee6">deploy en cada push</text>
+
+            <!-- Server -->
+            <rect x="650" y="150" width="290" height="330" rx="16" fill="#2a2250" stroke="#43397a" stroke-width="2"/>
+            <text x="670" y="180" font-size="15" font-weight="700">Render · servidor de juego</text>
+            <rect x="670" y="196" width="250" height="196" rx="10" fill="#1b1533" stroke="#e5337a" stroke-width="2"/>
+            <text x="686" y="222" font-weight="700" fill="#e5337a">PistuRoom (Colyseus)</text>
+            <text x="686" y="246" fill="#c9bee6">Valida cada mensaje</text>
+            <text x="686" y="268" fill="#c9bee6">Temporizadores 20 s / 8 s / 10 s</text>
+            <text x="686" y="290" fill="#c9bee6">Puntos, ¡Lotería! y votación</text>
+            <text x="686" y="312" fill="#c9bee6">Guarda tu lugar 60 s si te caes</text>
+            <text x="686" y="334" fill="#c9bee6">Pausa si queda un solo jugador</text>
+            <text x="686" y="356" fill="#c9bee6">Máx. 20 mensajes/s por cliente</text>
+            <text x="686" y="378" fill="#c9bee6">Salas en memoria, código de 6</text>
+            <text x="670" y="420" font-weight="700">GameState (schema)</text>
+            <text x="670" y="442" fill="#c9bee6">Jugadores, tablas, marcas, puntos,</text>
+            <text x="670" y="462" fill="#c9bee6">fase, pista. Sin la carta secreta.</text>
+
+            <!-- Client <-> server -->
+            <line x1="322" y1="190" x2="646" y2="190" stroke="currentColor" stroke-width="2" marker-end="url(#arrow)"/>
+            <text x="484" y="180" text-anchor="middle">intenciones</text>
+            <text x="484" y="210" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="#c9bee6">start · clue · guess · next · vote</text>
+            <line x1="646" y1="258" x2="322" y2="258" stroke="currentColor" stroke-width="2" marker-end="url(#arrow)"/>
+            <text x="484" y="248" text-anchor="middle">estado sincronizado</text>
+            <text x="484" y="278" text-anchor="middle" font-size="12" fill="#c9bee6">solo los cambios, binario, por WebSocket</text>
+            <line x1="646" y1="330" x2="322" y2="330" stroke="#e5337a" stroke-width="2" marker-end="url(#arrow-pink)"/>
+            <text x="484" y="320" text-anchor="middle" fill="#e5337a" font-weight="700">carta secreta</text>
+            <text x="484" y="350" text-anchor="middle" font-size="12" fill="#c9bee6">mensaje privado, solo al gritón</text>
+
+            <!-- Shared -->
+            <rect x="380" y="400" width="220" height="80" rx="12" fill="#1b1533" stroke="#f5b700" stroke-width="2"/>
+            <text x="490" y="428" text-anchor="middle" font-weight="700" fill="#f5b700">@pistu/shared</text>
+            <text x="490" y="450" text-anchor="middle" fill="#c9bee6">Reglas puras y protocolo</text>
+            <text x="490" y="468" text-anchor="middle" fill="#c9bee6">94 pruebas unitarias</text>
+            <line x1="380" y1="440" x2="324" y2="440" stroke="#f5b700" stroke-width="2" stroke-dasharray="5 4"/>
+            <line x1="600" y1="440" x2="646" y2="440" stroke="#f5b700" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="352" y="432" text-anchor="middle" font-size="12" fill="#c9bee6">importa</text>
+            <text x="623" y="432" text-anchor="middle" font-size="12" fill="#c9bee6">importa</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Cliente y servidor importan las mismas reglas de <code>shared</code>, así que la validación en vivo del cliente y la decisión del servidor nunca se contradicen. La carta secreta no viaja en el estado compartido: solo el gritón la recibe, en un mensaje privado, hasta la revelación.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 960 300" role="img" aria-label="Fases de una partida: sala, el gritón escribe, adivinan, revelación; de la revelación vuelve a una nueva ronda o, con ¡Lotería!, pasa a votación y final; si queda un solo jugador conectado la partida se pausa hasta 60 segundos.">
+          <defs>
+            <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="currentColor"/></marker>
+          </defs>
+          <g font-family="Figtree, system-ui, sans-serif" font-size="13" fill="currentColor">
+            <!-- Loops -->
+            <path d="M575 96 C575 44, 235 44, 235 92" fill="none" stroke="currentColor" stroke-width="2" marker-end="url(#arrow2)"/>
+            <text x="405" y="54" text-anchor="middle" fill="#c9bee6">siguiente ronda · otro gritón</text>
+            <path d="M890 96 C890 10, 75 10, 75 92" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow2)"/>
+            <text x="482" y="24" text-anchor="middle" fill="#c9bee6">otra partida, mismos jugadores</text>
+
+            <!-- Nodes -->
+            <rect x="20" y="96" width="110" height="64" rx="12" fill="#2a2250" stroke="#43397a" stroke-width="2"/>
+            <text x="75" y="124" text-anchor="middle" font-weight="700">Sala</text>
+            <text x="75" y="144" text-anchor="middle" font-size="12" fill="#c9bee6">3 a 8 jugadores</text>
+
+            <rect x="170" y="96" width="130" height="64" rx="12" fill="#2a2250" stroke="#f5b700" stroke-width="2"/>
+            <text x="235" y="124" text-anchor="middle" font-weight="700">El gritón escribe</text>
+            <text x="235" y="144" text-anchor="middle" font-size="12" fill="#c9bee6">20 s</text>
+
+            <rect x="340" y="96" width="130" height="64" rx="12" fill="#2a2250" stroke="#e5337a" stroke-width="2"/>
+            <text x="405" y="124" text-anchor="middle" font-weight="700">Adivinan</text>
+            <text x="405" y="144" text-anchor="middle" font-size="12" fill="#c9bee6">8 s o todos listos</text>
+
+            <rect x="510" y="96" width="130" height="64" rx="12" fill="#2a2250" stroke="#2ec4b6" stroke-width="2"/>
+            <text x="575" y="124" text-anchor="middle" font-weight="700">Revelación</text>
+            <text x="575" y="144" text-anchor="middle" font-size="12" fill="#c9bee6">10 s o todos listos</text>
+
+            <rect x="690" y="96" width="110" height="64" rx="12" fill="#2a2250" stroke="#43397a" stroke-width="2"/>
+            <text x="745" y="124" text-anchor="middle" font-weight="700">Votación</text>
+            <text x="745" y="144" text-anchor="middle" font-size="12" fill="#c9bee6">20 s · +2 puntos</text>
+
+            <rect x="840" y="96" width="100" height="64" rx="12" fill="#2a2250" stroke="#43397a" stroke-width="2"/>
+            <text x="890" y="124" text-anchor="middle" font-weight="700">Final</text>
+            <text x="890" y="144" text-anchor="middle" font-size="12" fill="#c9bee6">marcador</text>
+
+            <!-- Forward arrows -->
+            <line x1="130" y1="128" x2="166" y2="128" stroke="currentColor" stroke-width="2" marker-end="url(#arrow2)"/>
+            <line x1="300" y1="128" x2="336" y2="128" stroke="currentColor" stroke-width="2" marker-end="url(#arrow2)"/>
+            <text x="318" y="182" text-anchor="middle" font-size="12" fill="#c9bee6">pista válida</text>
+            <line x1="470" y1="128" x2="506" y2="128" stroke="currentColor" stroke-width="2" marker-end="url(#arrow2)"/>
+            <line x1="640" y1="128" x2="686" y2="128" stroke="currentColor" stroke-width="2" marker-end="url(#arrow2)"/>
+            <text x="663" y="182" text-anchor="middle" font-size="12" fill="#c9bee6">¡Lotería!</text>
+            <line x1="800" y1="128" x2="836" y2="128" stroke="currentColor" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Pause branch -->
+            <rect x="250" y="222" width="200" height="60" rx="12" fill="#1b1533" stroke="#9b90bd" stroke-width="2" stroke-dasharray="6 4"/>
+            <text x="350" y="248" text-anchor="middle" font-weight="700">Pausa</text>
+            <text x="350" y="267" text-anchor="middle" font-size="12" fill="#c9bee6">hasta 60 s, nadie pierde puntos</text>
+            <line x1="300" y1="162" x2="300" y2="218" stroke="currentColor" stroke-width="2" marker-end="url(#arrow2)"/>
+            <text x="292" y="202" text-anchor="end" font-size="12" fill="#c9bee6">queda 1 conectado</text>
+            <line x1="410" y1="218" x2="410" y2="164" stroke="currentColor" stroke-width="2" marker-end="url(#arrow2)"/>
+            <text x="418" y="202" font-size="12" fill="#c9bee6">alguien vuelve</text>
+            <path d="M450 252 H890 V164" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow2)"/>
+            <text x="670" y="244" text-anchor="middle" font-size="12" fill="#c9bee6">nadie vuelve</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Cada fase tiene un tiempo máximo y termina antes si todos ya actuaron. Si quedan menos de dos conectados, la ronda se cancela sin sumar ni restar puntos y la partida espera a que alguien regrese.</figcaption>
+    </figure>
+  </section>
+
+  <section id="decisiones">
+    <div class="section-head">
+      <p class="eyebrow">Decisiones técnicas</p>
+      <h2>Lo que hace que aguante una partida real</h2>
+    </div>
+    <div class="decisions">
+      <div class="decision"><span class="tag" style="color: var(--pink)">Antitrampa</span><h3>Servidor autoritativo</h3><p>El cliente nunca suma puntos ni cambia el estado. Cada mensaje pasa por validadores que aceptan solo la forma esperada; un voto con <code>"__proto__"</code> o un texto de 5 MB se descartan antes de llegar a la lógica.</p></div>
+      <div class="decision"><span class="tag" style="color: var(--turq)">Celulares</span><h3>Reconexión sin perder tu lugar</h3><p>Si la señal se cae, el servidor guarda tus puntos y tu tabla 60 segundos. Si recargas la página, una llave por pestaña te devuelve a tu asiento; si eras el gritón, tu carta secreta vuelve a llegar.</p></div>
+      <div class="decision"><span class="tag" style="color: var(--yellow)">Interfaz</span><h3>HTML para las pantallas, Phaser para la tabla</h3><p>Los menús son HTML/CSS fieles al diseño. Phaser dibuja la tabla en un canvas a la resolución del dispositivo, alineada a un hueco reservado en el HTML, así que ambos se ven como una sola pantalla.</p></div>
+      <div class="decision"><span class="tag" style="color: var(--muted)">Costo</span><h3>$0 en infraestructura</h3><p>Las pantallas viven en un sitio estático en CDN y el servidor en el plan gratuito de Render. Para esconder el arranque en frío, la página despierta al servidor apenas carga Inicio.</p></div>
+    </div>
+  </section>
+
+  <section id="pruebas">
+    <div class="section-head">
+      <p class="eyebrow">Cómo se probó</p>
+      <h2>Bots que juegan, se desconectan y hacen trampa</h2>
+      <p class="lede">Además de las pruebas unitarias, tres scripts conectan bots reales al servidor. Las capturas de esta página salieron de una partida completa en Chrome sin cabeza.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Prueba</th><th>Qué hace</th><th>Revisiones</th></tr></thead>
+        <tbody>
+          <tr><td>Reglas (Vitest)</td><td>Validación de pistas, puntos, líneas, votos y mensajes malformados</td><td class="num">94 tests</td></tr>
+          <tr><td>Partida completa</td><td>Tres bots juegan hasta ¡Lotería!, votan y piden otra partida</td><td class="num">1 partida</td></tr>
+          <tr><td>Reconexión</td><td>Caídas en sala, a media ronda, del gritón, de quien no vuelve, pausa y reanudación</td><td class="num">13</td></tr>
+          <tr><td>Abuso</td><td>Un tramposo manda 27 tipos de basura en cada fase y un spammer 100 mensajes de golpe</td><td class="num">8</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="compartir">
+    <div class="share">
+      <img src="/pistu/pistu-mejor-pista.png" alt="Imagen compartible: la mejor pista de la partida, Can azteca lampiño y negro, de Luis, era El Xolo">
+      <div class="section-head">
+        <p class="eyebrow">Diseñado para compartirse</p>
+        <h2>La mejor pista sale como imagen</h2>
+        <p class="lede">Al final, el juego genera en el celular una imagen con la pista más votada y la dirección del juego, lista para WhatsApp o redes. No usa ningún servicio externo: se dibuja con canvas a partir de los mismos colores y tipografías.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="siguiente">
+    <div class="section-head">
+      <p class="eyebrow">Lo que sigue</p>
+      <h2>Hoja de ruta</h2>
+    </div>
+    <div class="next">
+      <div><h3>Lotería del Día</h3><p>Un reto diario para jugar solo, igual para todos y con racha, que corre completo en el navegador.</p></div>
+      <div><h3>Pulido y lanzamiento</h3><p>Animaciones del frijol y la revelación, pruebas de carga y métricas de retención.</p></div>
+      <div><h3>Monetización justa</h3><p>Cosméticos y paquetes de cartas con arte de un ilustrador. Nunca ventajas pagadas.</p></div>
+    </div>
+    <a class="back" href="/projects.html">← Ver todos los proyectos</a>
+  </section>
+
+  <footer>
+    <span>Pistu · prototipo v0 · 2026 · por <a href="/index.html">Luis Mata</a></span>
+    <span>TypeScript · Colyseus · Phaser · Vite · Render</span>
+  </footer>
+</div>
+
+  </body>
+</html>
